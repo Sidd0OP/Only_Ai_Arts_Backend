@@ -26,7 +26,7 @@ public class DatabaseUserDetailService implements UserDetailsService{
 			throw new UsernameNotFoundException("Email Not Found");
 		}
 		
-		return new UserState(user);
+		return new UserStateDetails(user);
 	}
 
 }

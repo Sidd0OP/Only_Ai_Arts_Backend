@@ -18,7 +18,6 @@ public class UserDetail {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	
 	private long id;
 	
 	private String email;
@@ -42,7 +41,7 @@ public class UserDetail {
 	private String currentSignInIp;
 	
 	private String salt;
-	
+
 	private String password;
 	
 	@Override
@@ -65,5 +64,9 @@ public class UserDetail {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public String getSalt() {
+		return salt;
 	}
 }

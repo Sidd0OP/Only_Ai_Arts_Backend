@@ -9,14 +9,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.simulator.forum.entity.UserDetail;
 
-public class UserState implements UserDetails{
+public class UserStateDetails implements UserDetails{
 
 	private static final long serialVersionUID = 1L;
 	
 	
 	private UserDetail user;
 
-	public UserState(UserDetail user)
+	public UserStateDetails(UserDetail user)
 	{
 		this.user = user;
 	}
@@ -38,6 +38,11 @@ public class UserState implements UserDetails{
 		
 		
 		return user.getEmail();
+	}
+	
+	public String getSalt() 
+	{
+		return user.getSalt();
 	}
 
 }

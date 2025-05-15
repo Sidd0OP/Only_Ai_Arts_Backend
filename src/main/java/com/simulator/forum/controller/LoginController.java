@@ -61,10 +61,6 @@ public class LoginController {
 		
 		return new ResponseEntity<>("Created"  , HttpStatus.OK);
 	}
-	
-	
-	
-
 
 	private boolean validEmail(String email) 
 	{

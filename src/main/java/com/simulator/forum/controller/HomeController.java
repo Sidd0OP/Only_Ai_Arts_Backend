@@ -6,6 +6,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
+	
+	@GetMapping("/profile")
+	public String profile() 
+	{
+		return "User Profile";
+	}
 
 	@GetMapping("/home")
 	public String home() 
@@ -14,7 +20,7 @@ public class HomeController {
 	}
 	
 	
-	@GetMapping("/post")
+	@PostMapping("/post")
 	public String post() 
 	{
 		return "Post Page";

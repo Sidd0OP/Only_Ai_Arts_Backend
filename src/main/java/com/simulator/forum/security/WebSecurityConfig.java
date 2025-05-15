@@ -55,20 +55,14 @@ public class WebSecurityConfig {
 	
 	
 	
-	@Bean 
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-	    return new BCryptPasswordEncoder();
-	}
+	
 	
 	@Bean 
 	public AuthenticationProvider authenticationProvider() 
 	{
-		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		SaltedAuthenticationProvider saltedAuthenticationProvider = new SaltedAuthenticationProvider(databaseUserDetailService);
 		
-		provider.setUserDetailsService(databaseUserDetailService);
-		provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
-		
-		return provider;
+		return saltedAuthenticationProvider;
 	}
 	
 }

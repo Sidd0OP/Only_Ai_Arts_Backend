@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.simulator.forum.entity.UserDetail;
 
 public class UserState implements UserDetails{
+
+	private static final long serialVersionUID = 1L;
 	
 	
 	private UserDetail user;

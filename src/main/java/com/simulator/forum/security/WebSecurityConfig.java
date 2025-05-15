@@ -25,8 +25,12 @@ public class WebSecurityConfig {
 	{
 		http.authorizeHttpRequests(auth -> {
 			auth
-			.requestMatchers("/home" , "/").permitAll()
+			.requestMatchers("/register" , "/home" , "/").permitAll()
 			.requestMatchers("/post").authenticated();
+		})
+		
+		.csrf(c -> {
+			c.disable();
 		})
 		
 		.formLogin(form ->

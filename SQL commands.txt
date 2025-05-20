@@ -1,0 +1,57 @@
+----------------------------------SELECT FIRST FEW POST DETAILS FOR HOME PAGE -----------------------------------------------
+
+select p.id , p.title , p.body , p.created , p.edited , p.comment_count , u.id as user_id , u.name as user_name  
+from post p join user_detail u on
+p.user_id = u.id;
+
+
+----------------------------------SELECT  ALL DETAILS OF A POST FOR VIEWING POST -----------------------------------------------
+
+- Part 1 get post details 
+
+select p.id as post_id , p.user_id , p.title , p.body , p.created , p.edited , p.comment_count , p.image_url ,
+u.name , u.profile_photo_url 
+from post p join user_detail u on p.user_id = u.id and p.id = 2;
+
+
+- Part 2 get comment details 
+
+select c.id , c.user_id , c.body , c.created , c.edited , u.name , u.profile_photo_url 
+from comment c join user_detail u on 
+c.user_id = u.id and c.post_id = 2;
+
+-Part 3 get reply details for each comment 
+
+select r.user_id , r.body , r.created , r.edited ,
+u.name , u.profile_photo_url 
+from reply r join user_detail u 
+on r.user_id = u.id and r.comment_id = 3;
+
+- Combining all replies and comments into single query 
+
+select 
+
+c.id as comment_id , 
+c.user_id , 
+c.body , 
+c.created , 
+c.edited , 
+u.name , 
+u.profile_photo_url ,
+r.user_id,
+r.body,
+r.created,
+r.edited
+
+from 
+	comment c 
+join 
+	user_detail u on c.user_id = u.id and c.post_id = 2
+left join 
+	reply r on r.comment_id = c.id
+;
+
+
+
+
+

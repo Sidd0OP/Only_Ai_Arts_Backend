@@ -12,15 +12,13 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "post")
-@Getter
-@Setter
 public class Post {
 	
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
-	
+
 	private long userId;
 	
 	private String title;
@@ -36,5 +34,78 @@ public class Post {
 	private Integer commentCount;
 	
 	private String imageUrl;
+	
+	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(long userId) {
+		this.userId = userId;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	public ZonedDateTime getCreated() {
+		return created;
+	}
+
+	public void setCreated(ZonedDateTime created) {
+		this.created = created;
+	}
+
+	public ZonedDateTime getEdited() {
+		return edited;
+	}
+
+	public void setEdited(ZonedDateTime edited) {
+		this.edited = edited;
+	}
+
+	public Integer getEditCount() {
+		return editCount;
+	}
+
+	public void setEditCount(Integer editCount) {
+		this.editCount = editCount;
+	}
+
+	public Integer getCommentCount() {
+		return commentCount;
+	}
+
+	public void setCommentCount(Integer commentCount) {
+		this.commentCount = commentCount;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 
 }

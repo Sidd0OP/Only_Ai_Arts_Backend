@@ -18,4 +18,7 @@ public interface UserRepository extends JpaRepository<UserDetail , Long>
 	@Modifying
 	@Transactional
 	void createUser(String email , String lastLoginIp , String currentSignInIp , String Salt , String Password);
+	
+	
+	
 }

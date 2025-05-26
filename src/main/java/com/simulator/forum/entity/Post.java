@@ -36,6 +36,10 @@ public class Post {
 	private String imageUrl;
 	
 	
+	
+	
+	
+
 	public long getId() {
 		return id;
 	}

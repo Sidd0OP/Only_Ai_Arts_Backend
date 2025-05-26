@@ -9,23 +9,47 @@ p.user_id = u.id;
 
 - Part 1 get post details 
 
-select p.id as post_id , p.user_id , p.title , p.body , p.created , p.edited , p.comment_count , p.image_url ,
+select p.id as post_id , 
+p.user_id , 
+p.title , 
+p.body , 
+p.created , 
+p.edited , 
+p.comment_count , 
+p.image_url ,
 u.name , u.profile_photo_url 
-from post p join user_detail u on p.user_id = u.id and p.id = 2;
+from post p join user_detail u on p.user_id = u.id and p.id = ?1
 
 
-- Part 2 get comment details 
+- Part 2 get all comments 
 
-select c.id , c.user_id , c.body , c.created , c.edited , u.name , u.profile_photo_url 
+select
+c.id as comment_id,
+c.user_id , 
+c.body , 
+c.created , 
+c.edited ,
+u.name as user_name, 
+u.profile_photo_url 
 from comment c join user_detail u on 
-c.user_id = u.id and c.post_id = 2;
+c.user_id = u.id and c.post_id = ?1
 
--Part 3 get reply details for each comment 
+-Part 3 get all replies 
 
-select r.user_id , r.body , r.created , r.edited ,
-u.name , u.profile_photo_url 
+select 
+r.user_id , 
+r.comment_id ,
+r.body , 
+r.created , 
+r.edited ,
+u.name as user_name, 
+u.profile_photo_url 
 from reply r join user_detail u 
-on r.user_id = u.id and r.comment_id = 3;
+on r.user_id = u.id and r.post_id = ?1
+
+
+
+
 
 - Combining all replies and comments into single query 
 

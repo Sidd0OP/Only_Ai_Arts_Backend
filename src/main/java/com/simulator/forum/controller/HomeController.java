@@ -58,10 +58,5 @@ public class HomeController {
 	}
 	
 	
-	@GetMapping("/post")
-	public String post(HttpServletRequest request) 
-	{
-		Principal principal = request.getUserPrincipal();
-		return principal.getName();
-	}
+	
 }

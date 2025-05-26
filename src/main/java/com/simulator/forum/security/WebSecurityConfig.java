@@ -31,8 +31,8 @@ public class WebSecurityConfig {
 	{
 		http.authorizeHttpRequests(auth -> {
 			auth
-			.requestMatchers("/register" , "/home" , "/" , "/error").permitAll()
-			.requestMatchers("/post").authenticated();
+			.requestMatchers("/register" , "/home" , "/" , "/error" , "/post/**").permitAll()
+			.requestMatchers("/create").authenticated();
 		})
 		
 		.csrf(c -> {

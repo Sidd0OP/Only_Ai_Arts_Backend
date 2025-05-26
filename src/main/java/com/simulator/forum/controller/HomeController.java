@@ -1,6 +1,7 @@
 package com.simulator.forum.controller;
 
 
+import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,8 @@ import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.model.PostSnippetModel;
 import com.simulator.forum.repository.PostRepository;
 import com.simulator.forum.repository.UserRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 public class HomeController {
@@ -47,10 +50,18 @@ public class HomeController {
 		return new ResponseEntity<>(postRepository.getPostSnippets()  , HttpStatus.OK);
 	}
 	
-	
-	@PostMapping("/post")
-	public String post() 
+	@GetMapping("/")
+	public String main() 
 	{
-		return "Post Page";
+		
+		return "Home";
+	}
+	
+	
+	@GetMapping("/post")
+	public String post(HttpServletRequest request) 
+	{
+		Principal principal = request.getUserPrincipal();
+		return principal.getName();
 	}
 }

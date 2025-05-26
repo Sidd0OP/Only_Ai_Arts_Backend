@@ -37,17 +37,19 @@ public class SaltedAuthenticationProvider implements AuthenticationProvider{
 		
 		String saltedDatabasePassword = user.getPassword();
 		
-		System.out.println(saltedPassword + " " + saltedDatabasePassword);
+		
 		
 		if(!passwordEncoder.matches(password + user.getSalt(), saltedDatabasePassword)) 
 		{
-			throw new AuthenticationException("Password do not match") {};
+			System.out.println("PASSWORDS DONT MATCH EXCEPTION WILL BE THROWN");
+			throw new AuthenticationException("Password do not match") {
+				private static final long serialVersionUID = 1L;};
 		}
 		
 		
 		Authentication authenticationObject = new UsernamePasswordAuthenticationToken(user , saltedPassword , user.getAuthorities());
 		
-		
+		System.out.println("USER IS EXISTING AND IS AUTHENTICATED");
 		return authenticationObject;
 	}
 

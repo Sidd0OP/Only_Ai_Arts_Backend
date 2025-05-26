@@ -1,6 +1,6 @@
 ----------------------------------SELECT FIRST FEW POST DETAILS FOR HOME PAGE -----------------------------------------------
 
-select p.id , p.title , p.body , p.created , p.edited , p.comment_count , u.id as user_id , u.name as user_name  
+select p.id , p.title , p.body , p.created , p.edited , p.comment_count , u.id as user_id , u.name  
 from post p join user_detail u on
 p.user_id = u.id;
 

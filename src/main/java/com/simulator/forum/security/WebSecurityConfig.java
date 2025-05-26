@@ -1,5 +1,7 @@
 package com.simulator.forum.security;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @Configuration
 @EnableWebSecurity(debug = false)
@@ -19,13 +22,16 @@ public class WebSecurityConfig {
 	@Autowired
 	private DatabaseUserDetailService databaseUserDetailService;
 	
+	@Autowired 
+	private RememberMeService rememberMeService;
+	
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
 	{
 		http.authorizeHttpRequests(auth -> {
 			auth
-			.requestMatchers("/register" , "/home" , "/").permitAll()
+			.requestMatchers("/register" , "/home" , "/" , "/error").permitAll()
 			.requestMatchers("/post").authenticated();
 		})
 		
@@ -33,13 +39,14 @@ public class WebSecurityConfig {
 			c.disable();
 		})
 		
-		.formLogin(form ->
-		{
-			form
-			.loginPage("/new")
-			.permitAll();
-		})
+//		.formLogin(form ->
+//		{
+//			form
+//			.loginPage("/login")
+//			.permitAll();
+//		})
 		
+		.formLogin(Customizer.withDefaults())
 		
 		.logout(logout -> 
 		{
@@ -47,6 +54,14 @@ public class WebSecurityConfig {
 			.permitAll();
 			
 		})
+		
+		.rememberMe(remember -> 
+		
+		remember
+		.tokenRepository(rememberMeService)
+		.tokenValiditySeconds(1209600)
+		
+		)
 		
 		.httpBasic();
 		
@@ -64,5 +79,7 @@ public class WebSecurityConfig {
 		
 		return saltedAuthenticationProvider;
 	}
+	
+	
 	
 }

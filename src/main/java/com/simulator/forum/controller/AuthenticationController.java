@@ -20,12 +20,19 @@ import com.simulator.forum.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-public class LoginController {
+public class AuthenticationController {
 	
 	@Autowired
 	private UserRepository userRepository;
 	
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	
+	
+//	@GetMapping("/login")
+//	public String login() 
+//	{
+//		return "login";
+//	}
 	
 	
 	@PostMapping("/register")

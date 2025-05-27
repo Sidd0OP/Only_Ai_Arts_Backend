@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.simulator.forum.dto.UserProfileDto;
 import com.simulator.forum.dto.snippet.CommentSnippet;
+import com.simulator.forum.dto.snippet.HomeDto;
 import com.simulator.forum.dto.snippet.ReplySnippet;
 import com.simulator.forum.dto.snippet.UserPostSnippet;
 import com.simulator.forum.entity.Comment;
 import com.simulator.forum.entity.Post;
 import com.simulator.forum.entity.Reply;
 import com.simulator.forum.entity.UserDetail;
-import com.simulator.forum.model.PostSnippetModel;
 import com.simulator.forum.repository.CommentRepository;
 import com.simulator.forum.repository.PostRepository;
 import com.simulator.forum.repository.ReplyRepository;
@@ -51,27 +53,64 @@ public class HomeController {
 
 	@GetMapping("/home")
 	public ResponseEntity<?> home() 
-	{		
-		return new ResponseEntity<>("HOME"  , HttpStatus.OK);
+	{	
+		
+		UserDetail user;
+		
+		
+		Authentication  authObject  = SecurityContextHolder.getContext().getAuthentication();
+		
+		if(authObject != null && authObject.isAuthenticated()) 
+		{
+			user = userRepository.findByEmail(authObject.getName());
+			
+			if(user == null) 
+			{
+				
+				HomeDto homeData = new HomeDto(false);
+				
+				return new ResponseEntity<>(homeData  , HttpStatus.OK);
+				
+			}else {
+				
+				HomeDto homeData = new HomeDto(true);
+				return new ResponseEntity<>(homeData  , HttpStatus.OK);
+			}
+		}
+		
+		HomeDto homeData = new HomeDto(false);
+		return new ResponseEntity<>(homeData  , HttpStatus.OK);
 	}
 	
 	@GetMapping("/me")
-	public void myProfile() 
+	public String myProfile() 
 	{
+			
+		UserDetail user;
 		
+		Authentication  authObject  = SecurityContextHolder.getContext().getAuthentication();
+		
+		if(authObject != null && authObject.isAuthenticated()) 
+		{
+			user = userRepository.findByEmail(authObject.getName());
+			
+			if(user == null) 
+			{
+				return "redirect:/error";
+				
+			}else {
+				
+				return "redirect:/profile/" + user.getId();
+			}
+		}
+		
+		return "redirect:/error";
 	}
 	
-	@GetMapping("/profile/{id}")
-	public ResponseEntity<?> profile(@PathVariable String id) 
+	@GetMapping("/profile/{userId}")
+	public ResponseEntity<?> profile(@PathVariable long userId) 
 	{
-		if(id == null)return new ResponseEntity<>("format = profile/id"  , HttpStatus.BAD_REQUEST);
-		
-		long userId;
-		
-		try {userId = Long.valueOf(id);}catch(NumberFormatException e) 
-		{
-			return new ResponseEntity<>("numeric parameter required"  , HttpStatus.BAD_REQUEST);
-		}
+
 		
 		Optional<UserDetail> user = userRepository.findById(userId);
 		

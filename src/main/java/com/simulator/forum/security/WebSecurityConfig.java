@@ -31,8 +31,21 @@ public class WebSecurityConfig {
 	{
 		http.authorizeHttpRequests(auth -> {
 			auth
-			.requestMatchers("/register" , "/home" , "/" , "/error" , "/post/**" , "/snippets/**" , "/profile/**").permitAll()
-			.requestMatchers("/create" , "/me").authenticated();
+			.requestMatchers(
+					"/register" , 
+					"/home" , 
+					"/" , 
+					"/error" , 
+					"/post/**" , 
+					"/snippets/**" , 
+					"/profile/**").permitAll()
+			
+			.requestMatchers(
+					"/create" , 
+					"/me" , 
+					"/new/**" , 
+					"/comment/**" , 
+					"/reply/**").authenticated();
 		})
 		
 		.csrf(c -> {

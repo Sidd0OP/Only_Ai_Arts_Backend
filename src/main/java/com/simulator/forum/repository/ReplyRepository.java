@@ -3,7 +3,9 @@ package com.simulator.forum.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.simulator.forum.dto.ReplyDto;
 import com.simulator.forum.entity.Reply;
@@ -29,4 +31,14 @@ public interface ReplyRepository extends JpaRepository<Reply , Long>{
 
 	
 	List<Reply> findAllByUserId(long userId);
+	
+	
+	@Query(value =  """
+			
+			select add_reply(?1 , ?2 , ?3 , ?4);
+			
+			""" , nativeQuery = true)
+	@Modifying
+	@Transactional
+	Object[] createNewReply(long commentId , long userId , long postId ,  String body);
 }

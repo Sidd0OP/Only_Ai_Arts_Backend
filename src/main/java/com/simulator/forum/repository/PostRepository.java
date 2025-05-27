@@ -45,7 +45,6 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	
 	
 	
-	
 	@Query(value =  """
 			
 			select p.id as post_id , 
@@ -63,4 +62,13 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			""" , nativeQuery = true)
 	Optional<PostDto> getPostSnippetFromId(long postId);
 	
+	
+	@Query(value =  """
+			
+			select add_post(?1 , ?2 , ?3 , ?4);
+			
+			""" , nativeQuery = true)
+	@Modifying
+	@Transactional
+	Object[] createNewPost(long userId , String title , String body , String imageUrl);
 }

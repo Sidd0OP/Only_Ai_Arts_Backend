@@ -1,9 +1,9 @@
-package com.simulator.forum.dto;
+package com.simulator.forum.dto.snippet;
 
 import java.time.Instant;
 
 
-public record PostSnippet(
+public record HomePostSnippet(
 		
 		Long postId,
 		String title,
@@ -13,7 +13,7 @@ public record PostSnippet(
 		Integer commentCount,
 		Long userId,
 		String userName,
-		String userProfliePhotoUrl
+		String profliePhotoUrl
 		
 		) {
 

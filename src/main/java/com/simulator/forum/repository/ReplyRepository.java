@@ -27,4 +27,6 @@ public interface ReplyRepository extends JpaRepository<Reply , Long>{
 			""" , nativeQuery = true)
 	List<ReplyDto> getAllReplies(long postId);
 
+	
+	List<Reply> findAllByUserId(long userId);
 }

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.simulator.forum.dto.CommentDto;
+import com.simulator.forum.dto.snippet.CommentSnippet;
+import com.simulator.forum.dto.snippet.HomePostSnippet;
 import com.simulator.forum.entity.Comment;
 
 
@@ -28,4 +30,5 @@ public interface CommentRepository extends JpaRepository<Comment , Long>{
 			""" , nativeQuery = true)
 	List<CommentDto> getAllComments(long postId);
 
+	List<Comment> findAllByUserId(long userId);
 }

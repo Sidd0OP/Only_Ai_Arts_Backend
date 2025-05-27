@@ -23,6 +23,7 @@ import com.simulator.forum.dto.CommentReplyDto;
 import com.simulator.forum.dto.PostCommentReplyDto;
 import com.simulator.forum.dto.PostDto;
 import com.simulator.forum.dto.ReplyDto;
+import com.simulator.forum.entity.Comment;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.model.CommentForm;
 import com.simulator.forum.model.PostForm;
@@ -170,6 +171,20 @@ public class DescussionController {
 		UserDetail user =  findUserFromSession();	
 
 		if(user ==  null) {return new ResponseEntity<>("Login To Post Reply"  , HttpStatus.BAD_REQUEST);}
+		
+		Optional<Comment> optionalComment = commentRepository.findById(replyDetails.getCommentId());
+
+		if (optionalComment.isPresent()) {
+		    Comment c = optionalComment.get();
+		    if (c.getPostId() != replyDetails.getPostId()) {
+		    	
+		        return new ResponseEntity<>("U tried to act smart", HttpStatus.BAD_REQUEST);
+		    }
+		    
+		} else {
+			
+		    return new ResponseEntity<>("Comment not found", HttpStatus.BAD_REQUEST);
+		}
 		
 		try 
 		{

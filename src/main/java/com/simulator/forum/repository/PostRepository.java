@@ -71,4 +71,11 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	@Modifying
 	@Transactional
 	Object[] createNewPost(long userId , String title , String body , String imageUrl);
+	
+	@Query(value =  """
+			
+			select update_post_on_edit(?1)
+			
+			""" , nativeQuery = true)
+	Integer updatePost(long postId);
 }

@@ -42,4 +42,12 @@ public interface ReplyRepository extends JpaRepository<Reply , Long>{
 	@Modifying
 	@Transactional
 	Object[] createNewReply(long commentId , long userId , long postId ,  String body);
+	
+	
+	@Query(value =  """
+			
+			select update_reply_on_edit(?1)
+			
+			""" , nativeQuery = true)
+	Integer updateReply(long replyId);
 }

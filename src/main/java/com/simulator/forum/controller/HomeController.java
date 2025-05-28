@@ -64,21 +64,17 @@ public class HomeController {
 		{
 			user = userRepository.findByEmail(authObject.getName());
 			
-			if(user == null) 
+			if(user != null) 
 			{
 				
-				HomeDto homeData = new HomeDto(false);
-				
+				HomeDto homeData = new HomeDto(user.getId() , postRepository.getPostSnippets(0));
 				return new ResponseEntity<>(homeData  , HttpStatus.OK);
-				
-			}else {
-				
-				HomeDto homeData = new HomeDto(true);
-				return new ResponseEntity<>(homeData  , HttpStatus.OK);
+
 			}
 		}
 		
-		HomeDto homeData = new HomeDto(false);
+		HomeDto homeData = new HomeDto(null , postRepository.getPostSnippets(0));
+		
 		return new ResponseEntity<>(homeData  , HttpStatus.OK);
 	}
 	

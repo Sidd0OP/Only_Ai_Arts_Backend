@@ -195,6 +195,7 @@ public class DescussionController {
 		try 
 		{
 			postRepository.save(entity);
+			postRepository.updatePost(entity.getId());
 			return new ResponseEntity<>("Update Sucessful"  , HttpStatus.OK);
 			
 		}catch(Exception e) 
@@ -261,6 +262,10 @@ public class DescussionController {
 		try 
 		{
 			commentRepository.save(entity);
+			//this was supposed to be done by PG trigger but it not working cuz after update of row pg wont overwrite that idk...
+			//ik this is stupid 
+			commentRepository.updateComment(entity.getId());
+			
 			return new ResponseEntity<>("Update Sucessful"  , HttpStatus.OK);
 			
 		}catch(Exception e) 
@@ -339,6 +344,7 @@ public class DescussionController {
 		try 
 		{
 			replyRepository.save(entity);
+			replyRepository.updateReply(entity.getId());
 			return new ResponseEntity<>("Update Sucessful"  , HttpStatus.OK);
 			
 		}catch(Exception e) 

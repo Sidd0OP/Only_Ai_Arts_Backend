@@ -44,4 +44,12 @@ public interface CommentRepository extends JpaRepository<Comment , Long>{
 	@Modifying
 	@Transactional
 	Object[] createNewComment(long postId , long userId , String body);
+	
+	
+	@Query(value =  """
+		
+			select update_comment_on_edit(?1)
+			
+			""" , nativeQuery = true)
+	Integer updateComment(long commentId);
 }

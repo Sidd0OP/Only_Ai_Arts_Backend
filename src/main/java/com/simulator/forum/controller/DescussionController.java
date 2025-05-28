@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +25,14 @@ import com.simulator.forum.dto.PostCommentReplyDto;
 import com.simulator.forum.dto.PostDto;
 import com.simulator.forum.dto.ReplyDto;
 import com.simulator.forum.entity.Comment;
+import com.simulator.forum.entity.Post;
+import com.simulator.forum.entity.Reply;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.model.CommentForm;
 import com.simulator.forum.model.PostForm;
 import com.simulator.forum.model.ReplyForm;
+import com.simulator.forum.model.update.CommentReplyUpdateForm;
+import com.simulator.forum.model.update.PostUpdateForm;
 import com.simulator.forum.repository.CommentRepository;
 import com.simulator.forum.repository.PostRepository;
 import com.simulator.forum.repository.ReplyRepository;
@@ -49,29 +54,33 @@ public class DescussionController {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	
+	private UserDetail findUserFromSession() 
+	{
+		Authentication  authObject  = SecurityContextHolder.getContext().getAuthentication();
+			
+		
+		if(authObject != null && authObject.isAuthenticated()) 
+		{
+			UserDetail authenticatedUser = userRepository.findByEmail(authObject.getName());
+			
+			return authenticatedUser;
+			
+		}else {return null;}
+	}
+	
+	
+	
 
-	@GetMapping("/post/{id}")
-	public ResponseEntity<?> post(HttpServletRequest request , @PathVariable String id) 
+	@GetMapping("/post/{postId}")
+	public ResponseEntity<?> post(HttpServletRequest request , @PathVariable Long postId) 
 	{
 		
+		UserDetail user =  findUserFromSession();	
 		
-		if(id == null) 
-		{
-			return new ResponseEntity<>("format = post/id"  , HttpStatus.BAD_REQUEST);
-		}
-		
-		long postId;
-		
-		try 
-		{
-			postId = Long.valueOf(id);
-			
-		}catch(NumberFormatException e) {
-			
-			return new ResponseEntity<>("numeric parameter required"  , HttpStatus.BAD_REQUEST);
-		}
-		
-		
+		boolean postEditable = false;
+				
 		Optional<PostDto> post = postRepository.getPostSnippetFromId(postId);
 		
 		
@@ -91,26 +100,52 @@ public class DescussionController {
 						(c , replies.stream().
 							 filter(r -> r.commentId().equals(c.commentId()))
 							 .toList())).toList();
+		
+		
+		if(user != null) 
+		{
+			long userId = user.getId();
+			
+			if(post.get().userId() == userId) 
+			{
+
+				postEditable = true;
+				
+			}
+			
+			PostCommentReplyDto postCommentReplyDto = new PostCommentReplyDto
+					(
+							postEditable,
+							
+							comments.stream()
+							.filter( c -> c.userId() == userId)
+							.map(CommentDto::commentId).toList(),
+							
+							replies.stream()
+							.filter(r -> r.userId() == userId)
+							.map(ReplyDto::replyId)
+							.toList(),
+							
+							post.get(),
+							
+							commentReplies
+							
+					);
+			
+			return new ResponseEntity<>(postCommentReplyDto , HttpStatus.OK);
+			
+		}
 				
 
-		return new ResponseEntity<>(new PostCommentReplyDto(post.get() , commentReplies) , HttpStatus.OK);
+		return new ResponseEntity<>(new PostCommentReplyDto(false , List.of() , List.of() , post.get() , commentReplies) , HttpStatus.OK);
 		
 	}
 	
 	
-	private UserDetail findUserFromSession() 
-	{
-		Authentication  authObject  = SecurityContextHolder.getContext().getAuthentication();
-			
-		
-		if(authObject != null && authObject.isAuthenticated()) 
-		{
-			UserDetail authenticatedUser = userRepository.findByEmail(authObject.getName());
-			
-			return authenticatedUser;
-			
-		}else {return null;}
-	}
+	
+	
+	
+	
 	
 	@PostMapping("/new")
 	public ResponseEntity<?> createPost(@ModelAttribute PostForm postDetails)
@@ -138,6 +173,45 @@ public class DescussionController {
 	}
 	
 	
+	@PatchMapping("/new")
+	public ResponseEntity<?> updatePost(@ModelAttribute PostUpdateForm postUpdateDetails)
+	{
+		UserDetail user =  findUserFromSession();	
+
+		if(user ==  null) {return new ResponseEntity<>("Login to update"  , HttpStatus.BAD_REQUEST);}
+		
+		Optional<Post> post = postRepository.findById(postUpdateDetails.getPostId());
+		
+		if(post.isEmpty()) {return new ResponseEntity<>("Post Not Found"  , HttpStatus.NOT_FOUND);}
+		
+		if(post.get().getUserId() != user.getId()) {return new ResponseEntity<>("Not allowed"  , HttpStatus.FORBIDDEN);}
+		
+		
+		Post entity = post.get();
+		
+		entity.setTitle(postUpdateDetails.getTitle());
+		entity.setBody(postUpdateDetails.getBody());
+		
+		try 
+		{
+			postRepository.save(entity);
+			return new ResponseEntity<>("Update Sucessful"  , HttpStatus.OK);
+			
+		}catch(Exception e) 
+		{
+			return new ResponseEntity<>("Update Failed"  , HttpStatus.BAD_REQUEST);
+		}
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 	@PostMapping("/comment")
 	public ResponseEntity<?> createComment(@ModelAttribute CommentForm commentDetails)
 	{
@@ -162,6 +236,43 @@ public class DescussionController {
 		}
 
 	}
+	
+	
+	@PatchMapping("/comment")
+	public ResponseEntity<?> updateComment(@ModelAttribute CommentReplyUpdateForm commentReplyUpdateForm)
+	{
+		UserDetail user =  findUserFromSession();	
+
+		if(user ==  null) {return new ResponseEntity<>("Login to update"  , HttpStatus.BAD_REQUEST);}
+		
+		Optional<Comment> comment = commentRepository.findById(commentReplyUpdateForm.getId());
+		
+		if(comment.isEmpty()) {return new ResponseEntity<>("Comment Not Found"  , HttpStatus.NOT_FOUND);}
+		
+		if(comment.get().getUserId() != user.getId()) {return new ResponseEntity<>("Not allowed"  , HttpStatus.FORBIDDEN);}
+		
+		
+		Comment entity = comment.get();
+		
+		
+		entity.setBody(commentReplyUpdateForm.getBody());
+		
+		
+		try 
+		{
+			commentRepository.save(entity);
+			return new ResponseEntity<>("Update Sucessful"  , HttpStatus.OK);
+			
+		}catch(Exception e) 
+		{
+			return new ResponseEntity<>("Update Failed"  , HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
+	
+	
+	
 	
 	
 	@PostMapping("/reply")
@@ -202,5 +313,37 @@ public class DescussionController {
 			return new ResponseEntity<>("Failed"  , HttpStatus.BAD_REQUEST);
 		}
 
+	}
+	
+	
+	@PatchMapping("/reply")
+	public ResponseEntity<?> updateReply(@ModelAttribute CommentReplyUpdateForm commentReplyUpdateForm)
+	{
+		UserDetail user =  findUserFromSession();	
+
+		if(user ==  null) {return new ResponseEntity<>("Login to update"  , HttpStatus.BAD_REQUEST);}
+		
+		Optional<Reply> reply = replyRepository.findById(commentReplyUpdateForm.getId());
+		
+		if(reply.isEmpty()) {return new ResponseEntity<>("Comment Not Found"  , HttpStatus.NOT_FOUND);}
+		
+		if(reply.get().getUserId() != user.getId()) {return new ResponseEntity<>("Not allowed"  , HttpStatus.FORBIDDEN);}
+		
+		
+		Reply entity = reply.get();
+		
+		
+		entity.setBody(commentReplyUpdateForm.getBody());
+		
+		
+		try 
+		{
+			replyRepository.save(entity);
+			return new ResponseEntity<>("Update Sucessful"  , HttpStatus.OK);
+			
+		}catch(Exception e) 
+		{
+			return new ResponseEntity<>("Update Failed"  , HttpStatus.BAD_REQUEST);
+		}
 	}
 }

@@ -16,6 +16,7 @@ public interface ReplyRepository extends JpaRepository<Reply , Long>{
 	@Query(value =  """
 			
 			select 
+			r.id as reply_id,
 			r.user_id , 
 			r.comment_id ,
 			r.body , 

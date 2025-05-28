@@ -4,6 +4,7 @@ import java.time.Instant;
 
 public record ReplyDto
 		(
+				Long replyId,
 				Long userId,
 				Long commentId,
 				String body,

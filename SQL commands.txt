@@ -59,6 +59,7 @@ on r.user_id = u.id and r.post_id = ?1
 
 
 ---------------------------------------------------------------INSERT DATA FUNCTION------------------------------------------------------
+
 select add_post(12 , 'Functin Post' , 'I posted this post using function in sql' , null);
 
 select add_reply(3 , 10 , 15 , 'Reply done via a new function for testing');

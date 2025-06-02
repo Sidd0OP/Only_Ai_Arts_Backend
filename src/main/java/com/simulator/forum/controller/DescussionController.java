@@ -1,11 +1,8 @@
 package com.simulator.forum.controller;
 
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +14,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.simulator.forum.cloudflare.MediaService;
 import com.simulator.forum.dto.CommentDto;
 import com.simulator.forum.dto.CommentReplyDto;
 import com.simulator.forum.dto.PostCommentReplyDto;
@@ -55,6 +55,9 @@ public class DescussionController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	MediaService mediaSerive;
+	
 	
 	private UserDetail findUserFromSession() 
 	{
@@ -74,7 +77,7 @@ public class DescussionController {
 	
 
 	@GetMapping("/post/{postId}")
-	public ResponseEntity<?> post(HttpServletRequest request , @PathVariable Long postId) 
+	public ResponseEntity<?> post(HttpServletRequest request , @PathVariable Long postId ) 
 	{
 		
 		UserDetail user =  findUserFromSession();	
@@ -148,12 +151,28 @@ public class DescussionController {
 	
 	
 	@PostMapping("/new")
-	public ResponseEntity<?> createPost(@ModelAttribute PostForm postDetails)
+	public ResponseEntity<?> createPost(@ModelAttribute PostForm postDetails , 
+										@RequestParam(value = "file" , required = false) MultipartFile file)
 	{
 		
 		UserDetail user =  findUserFromSession();	
-
+		String url = "";
+		
 		if(user ==  null) {return new ResponseEntity<>("Login to create Post"  , HttpStatus.BAD_REQUEST);}
+		
+		try 
+		{
+			if(file != null) 
+			{
+				url = mediaSerive.uploadFile(file , "image");
+			}
+			
+						
+		}catch(Exception e) {
+			return new ResponseEntity<>("Failed"  , HttpStatus.BAD_REQUEST);
+		}
+		
+		
 		
 		try 
 		{
@@ -161,7 +180,7 @@ public class DescussionController {
 					user.getId() , 
 					postDetails.getTitle() , 
 					postDetails.getBody() , 
-					null);
+					url);
 			
 			return new ResponseEntity<>("Insert Sucessful"  , HttpStatus.OK);
 			

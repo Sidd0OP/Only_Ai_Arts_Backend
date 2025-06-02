@@ -11,8 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.simulator.forum.cloudflare.MediaService;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.model.RegisterForm;
 import com.simulator.forum.repository.UserRepository;
@@ -27,12 +30,6 @@ public class AuthenticationController {
 	
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	
-	
-//	@GetMapping("/login")
-//	public String login() 
-//	{
-//		return "login";
-//	}
 	
 	
 	@PostMapping("/register")
@@ -109,6 +106,9 @@ public class AuthenticationController {
 	{
 		return passwordEncoder.encode(password + salt);
 	}
+	
+	
+	
 	
 
 }

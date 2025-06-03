@@ -1,6 +1,8 @@
 package com.simulator.forum.security;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +11,9 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
@@ -21,6 +26,22 @@ public class WebSecurityConfig {
 	@Autowired 
 	private RememberMeService rememberMeService;
 	
+	@Bean 
+	public CorsConfigurationSource CorsConfiguration() 
+	{
+		CorsConfiguration config = new CorsConfiguration();
+		
+		config.setAllowedOrigins(List.of("http://localhost:5173"));
+		config.setAllowedMethods(List.of("GET" , "POST" , "PATCH"));
+		config.setAllowedHeaders(List.of("*"));
+		config.setAllowCredentials(true);
+
+		
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", config);
+	    return source;
+	}
+	
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
@@ -28,6 +49,7 @@ public class WebSecurityConfig {
 		http.authorizeHttpRequests(auth -> {
 			auth
 			.requestMatchers(
+					"/login",
 					"/register" , 
 					"/home" , 
 					"/" , 
@@ -44,19 +66,21 @@ public class WebSecurityConfig {
 					"/reply/**",
 					"/upload/profile").authenticated();
 		})
+		.cors(c -> c.configurationSource(CorsConfiguration()))
 		
 		.csrf(c -> {
 			c.disable();
 		})
 		
-//		.formLogin(form ->
-//		{
-//			form
-//			.loginPage("/login")
-//			.permitAll();
-//		})
+		.formLogin(form ->
+		{
+			form
+			.loginPage("/login")
+			.permitAll()
+			.defaultSuccessUrl("/home", true);;
+		})
 		
-		.formLogin(Customizer.withDefaults())
+//		.formLogin(Customizer.withDefaults())
 		
 		.logout(logout -> 
 		{

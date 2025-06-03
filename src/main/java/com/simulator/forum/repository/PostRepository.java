@@ -27,6 +27,7 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			p.created ,
 			p.edited , 
 			p.comment_count , 
+			p.image_url ,
 			u.id as user_id , 
 			u.name ,
 			u.profile_photo_url 

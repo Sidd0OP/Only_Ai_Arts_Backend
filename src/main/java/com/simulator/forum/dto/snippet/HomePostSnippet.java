@@ -11,6 +11,7 @@ public record HomePostSnippet(
 		Instant created,
 		Instant edited,
 		Integer commentCount,
+		String imageUrl,
 		Long userId,
 		String userName,
 		String profliePhotoUrl

@@ -55,26 +55,7 @@ public class HomeController {
 	@GetMapping("/home")
 	public ResponseEntity<?> home() 
 	{	
-		
-		UserDetail user;
-		
-		
-		Authentication  authObject  = SecurityContextHolder.getContext().getAuthentication();
-		
-		if(authObject != null && authObject.isAuthenticated()) 
-		{
-			user = userRepository.findByEmail(authObject.getName());
-			
-			if(user != null) 
-			{
-				
-				HomeDto homeData = new HomeDto(user.getId() , postRepository.getPostSnippets(0));
-				return new ResponseEntity<>(homeData  , HttpStatus.OK);
-
-			}
-		}
-		
-		HomeDto homeData = new HomeDto(null , postRepository.getPostSnippets(0));
+		HomeDto homeData = new HomeDto(postRepository.getLatestPostSnippets(), postRepository.getPostSnippets(0));
 		
 		return new ResponseEntity<>(homeData  , HttpStatus.OK);
 	}
@@ -184,7 +165,7 @@ public class HomeController {
 		
 		try 
 		{
-			pageNumber = Integer.valueOf(page) * 10;
+			pageNumber = Integer.valueOf(page) * 20;
 			
 		}catch(NumberFormatException e) {
 			

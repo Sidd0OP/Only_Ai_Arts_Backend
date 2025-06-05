@@ -56,7 +56,8 @@ public class WebSecurityConfig {
 					"/error" , 
 					"/post/**" , 
 					"/snippets/**" , 
-					"/profile/**").permitAll()
+					"/profile/**",
+					"/user/**").permitAll()
 			
 			.requestMatchers(
 					"/create" , 

@@ -2,6 +2,8 @@ package com.simulator.forum.dto;
 
 import java.util.List;
 
+import com.simulator.forum.dto.snippet.HomePostSnippet;
+
 public record PostCommentReplyDto
 	(
 			boolean postEditableByUser,
@@ -9,7 +11,8 @@ public record PostCommentReplyDto
 			List<Long> listOfEditableReplies,
 			
 			PostDto post,
-			List<CommentReplyDto> discussion
+			List<CommentReplyDto> discussion,
+			List<HomePostSnippet> similarPosts
 			
 			
 	) {

@@ -28,18 +28,43 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			p.edited , 
 			p.comment_count , 
 			p.image_url ,
+			p.heart,
 			u.id as user_id , 
 			u.name ,
 			u.profile_photo_url 
 			from post p join user_detail u on
 			p.user_id = u.id
-			order by p.created asc 
+			order by p.heart desc , p.created desc , p.comment_count desc
 			limit 20
-			offset ?1
+			offset ?1;
 			
 			""" , nativeQuery = true)
 	List<HomePostSnippet> getPostSnippets(int offset);
 	
+	
+	
+	
+	@Query(value =  """
+			
+			select 
+			p.id as post_id, 
+			p.title , 
+			p.body ,
+			p.created ,
+			p.edited , 
+			p.comment_count , 
+			p.image_url ,
+			p.heart,
+			u.id as user_id , 
+			u.name ,
+			u.profile_photo_url 
+			from post p join user_detail u on
+			p.user_id = u.id
+			order by p.created desc 
+			limit 10;
+			
+			""" , nativeQuery = true)
+	List<HomePostSnippet> getLatestPostSnippets();
 	
 	
 	List<Post> findAllByUserId(long userId);
@@ -73,10 +98,21 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	@Transactional
 	Object[] createNewPost(long userId , String title , String body , String imageUrl);
 	
+	
+	
 	@Query(value =  """
 			
 			select update_post_on_edit(?1)
 			
 			""" , nativeQuery = true)
 	Integer updatePost(long postId);
+	
+	
+	
+	@Query(value =  """
+			
+			select * from similar_post(?1)
+			
+			""" , nativeQuery = true)
+	List<HomePostSnippet> selectSimilarPost(long postId);
 }

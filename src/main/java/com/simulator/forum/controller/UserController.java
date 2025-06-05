@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.simulator.forum.cloudflare.MediaService;
+import com.simulator.forum.dto.UserLoginDto;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.repository.UserRepository;
 
@@ -38,6 +40,25 @@ public class UserController {
 			
 		}else {return null;}
 	}
+	
+	
+	@GetMapping("/user")
+	public ResponseEntity<?> getUserInfo()
+	{
+		UserDetail user =  findUserFromSession();
+		
+		if(user == null) 
+		{
+			UserLoginDto userData = new UserLoginDto(null , null , null);
+			
+			return new ResponseEntity<>(userData , HttpStatus.FORBIDDEN);
+		}
+		
+		UserLoginDto userData = new UserLoginDto(user.getId() , user.getName() , user.getProfilePhotoUrl());
+		
+		return new ResponseEntity<>(userData  , HttpStatus.OK);
+	}
+	
 	
 	@PostMapping("/upload/profile")
 	public ResponseEntity<?> uploadProfilePhoto(@RequestParam(value = "file" , required = true) MultipartFile file) 

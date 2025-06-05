@@ -4,7 +4,7 @@ import java.util.List;
 
 public record HomeDto(
 			
-			Long userId,
+			List<HomePostSnippet> latestPostSnippets,
 			List<HomePostSnippet> postSnippets
 			
 		

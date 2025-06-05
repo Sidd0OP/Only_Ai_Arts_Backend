@@ -25,6 +25,7 @@ import com.simulator.forum.dto.CommentReplyDto;
 import com.simulator.forum.dto.PostCommentReplyDto;
 import com.simulator.forum.dto.PostDto;
 import com.simulator.forum.dto.ReplyDto;
+import com.simulator.forum.dto.snippet.HomePostSnippet;
 import com.simulator.forum.entity.Comment;
 import com.simulator.forum.entity.Post;
 import com.simulator.forum.entity.Reply;
@@ -106,6 +107,17 @@ public class DescussionController {
 							 .toList())).toList();
 		
 		
+		List<HomePostSnippet> similarPost;
+		
+		try {
+			similarPost = postRepository.selectSimilarPost(postId);
+			
+		}catch(Exception e) {
+			similarPost = List.of();
+		}
+		
+		
+		
 		if(user != null) 
 		{
 			long userId = user.getId();
@@ -132,7 +144,9 @@ public class DescussionController {
 							
 							post.get(),
 							
-							commentReplies
+							commentReplies,
+							
+							similarPost
 							
 					);
 			
@@ -141,7 +155,12 @@ public class DescussionController {
 		}
 				
 
-		return new ResponseEntity<>(new PostCommentReplyDto(false , List.of() , List.of() , post.get() , commentReplies) , HttpStatus.OK);
+		return new ResponseEntity<>(new PostCommentReplyDto(false ,
+														List.of() , 
+														List.of() , 
+														post.get() , 
+														commentReplies,
+														similarPost) , HttpStatus.OK);
 		
 	}
 	

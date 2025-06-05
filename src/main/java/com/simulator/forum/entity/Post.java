@@ -35,7 +35,7 @@ public class Post {
 	
 	private String imageUrl;
 	
-	
+	private Integer heart;
 	
 	
 	

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.simulator.forum.dto.UserProfileDto;
 import com.simulator.forum.dto.snippet.CommentSnippet;
 import com.simulator.forum.dto.snippet.HomeDto;
+import com.simulator.forum.dto.snippet.HomePostSnippet;
 import com.simulator.forum.dto.snippet.ReplySnippet;
 import com.simulator.forum.dto.snippet.UserPostSnippet;
 import com.simulator.forum.entity.Comment;
@@ -58,6 +59,28 @@ public class HomeController {
 		HomeDto homeData = new HomeDto(postRepository.getLatestPostSnippets(), postRepository.getPostSnippets(0));
 		
 		return new ResponseEntity<>(homeData  , HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/search/{query}")
+	public ResponseEntity<?> search(@PathVariable String query)
+	{
+		List<HomePostSnippet> searchResult;
+		
+		try {
+			
+			searchResult = postRepository.searchPost(query);
+			
+			
+			
+		}catch(Exception e) {
+			
+		
+			searchResult = List.of();
+		}
+		
+		
+		return new ResponseEntity<>(searchResult  , HttpStatus.OK);
 	}
 	
 	@GetMapping("/me")

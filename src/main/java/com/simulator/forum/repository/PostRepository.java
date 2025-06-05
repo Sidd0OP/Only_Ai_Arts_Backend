@@ -115,4 +115,11 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			
 			""" , nativeQuery = true)
 	List<HomePostSnippet> selectSimilarPost(long postId);
+	
+	@Query(value =  """
+			
+			select * from search_post(?1)
+			
+			""" , nativeQuery = true)
+	List<HomePostSnippet> searchPost(String query);
 }

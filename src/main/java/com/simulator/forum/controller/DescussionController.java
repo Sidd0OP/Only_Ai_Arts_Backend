@@ -36,6 +36,7 @@ import com.simulator.forum.model.ReplyForm;
 import com.simulator.forum.model.update.CommentReplyUpdateForm;
 import com.simulator.forum.model.update.PostUpdateForm;
 import com.simulator.forum.repository.CommentRepository;
+import com.simulator.forum.repository.HeartRepository;
 import com.simulator.forum.repository.PostRepository;
 import com.simulator.forum.repository.ReplyRepository;
 import com.simulator.forum.repository.UserRepository;
@@ -44,6 +45,9 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 public class DescussionController {
+	
+	@Autowired
+	private HeartRepository heartRepository;
 	
 	@Autowired
 	private PostRepository postRepository;
@@ -165,6 +169,34 @@ public class DescussionController {
 	}
 	
 	
+	@PostMapping("/heart/{postId}")
+	public ResponseEntity<?> heartPost(@PathVariable Long postId)
+	{
+		UserDetail user =  findUserFromSession();
+		
+		if(user == null) 
+		{
+			return new ResponseEntity<>("Login to Heart"  , HttpStatus.BAD_REQUEST);
+		}
+		
+		long userId = user.getId();
+		
+		
+		if(heartRepository.hasUserHearted(postId, userId)) 
+		{
+			return new ResponseEntity<>("Hearted"  , HttpStatus.BAD_REQUEST);
+		}
+		
+		try {
+			
+			heartRepository.addHeart(postId, userId);
+			return new ResponseEntity<>("Hearted"  , HttpStatus.OK);
+			
+		}catch(Exception e) {
+			
+			return new ResponseEntity<>("Failed"  , HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	
 	

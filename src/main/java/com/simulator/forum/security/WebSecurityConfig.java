@@ -57,7 +57,8 @@ public class WebSecurityConfig {
 					"/post/**" , 
 					"/snippets/**" , 
 					"/profile/**",
-					"/user/**").permitAll()
+					"/user/**",
+					"/search/**").permitAll()
 			
 			.requestMatchers(
 					"/create" , 
@@ -65,7 +66,8 @@ public class WebSecurityConfig {
 					"/new/**" , 
 					"/comment/**" , 
 					"/reply/**",
-					"/upload/profile").authenticated();
+					"/upload/profile",
+					"/heart/**").authenticated();
 		})
 		.cors(c -> c.configurationSource(CorsConfiguration()))
 		

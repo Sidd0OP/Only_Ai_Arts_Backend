@@ -10,7 +10,7 @@ public record UserPostSnippet(
 		String body,
 		Instant created,
 		Instant edited,
-		Integer commentCount
+		String imageUrl
 		
 		) {
 

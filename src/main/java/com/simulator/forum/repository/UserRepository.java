@@ -14,10 +14,10 @@ public interface UserRepository extends JpaRepository<UserDetail , Long>
 	@NativeQuery(value = "select exists (select email from user_detail where email = ?1)")
 	Boolean emailExist(String email);
 	
-	@NativeQuery(value =  "INSERT INTO user_detail (email ,  last_login_ip, current_sign_in_ip, salt, password)VALUES (?1, ?2, ?3, ?4 , ?5)")
+	@NativeQuery(value =  "INSERT INTO user_detail (name , email ,  last_login_ip, current_sign_in_ip, salt, password)VALUES (?1, ?2, ?3, ?4 , ?5 , ?6)")
 	@Modifying
 	@Transactional
-	void createUser(String email , String lastLoginIp , String currentSignInIp , String Salt , String Password);
+	void createUser(String name , String email , String lastLoginIp , String currentSignInIp , String Salt , String Password);
 	
 	
 	

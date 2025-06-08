@@ -58,7 +58,8 @@ public class WebSecurityConfig {
 					"/snippets/**" , 
 					"/profile/**",
 					"/user/**",
-					"/search/**").permitAll()
+					"/search/**",
+					"/auth/google/**").permitAll()
 			
 			.requestMatchers(
 					"/create" , 

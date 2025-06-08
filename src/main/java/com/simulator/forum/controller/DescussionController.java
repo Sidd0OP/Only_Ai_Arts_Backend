@@ -184,7 +184,7 @@ public class DescussionController {
 		
 		if(heartRepository.hasUserHearted(postId, userId)) 
 		{
-			return new ResponseEntity<>("Hearted"  , HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("Already hearted"  , HttpStatus.BAD_REQUEST);
 		}
 		
 		try {

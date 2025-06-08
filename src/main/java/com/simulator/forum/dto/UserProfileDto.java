@@ -9,6 +9,7 @@ import com.simulator.forum.dto.snippet.UserPostSnippet;
 
 public record UserProfileDto(
 		
+		boolean editable,
 		Long userId,
 		String name, 
 		String profilePhotoUrl,

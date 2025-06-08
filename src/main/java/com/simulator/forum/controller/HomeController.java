@@ -45,11 +45,7 @@ public class HomeController {
 	@Autowired
 	private UserRepository userRepository;
 	
-	@Autowired
-	private CommentRepository commentRepository;
 	
-	@Autowired
-	private ReplyRepository replyRepository;
 	
 	
 
@@ -108,71 +104,6 @@ public class HomeController {
 		return "redirect:/error";
 	}
 	
-	@GetMapping("/profile/{userId}")
-	public ResponseEntity<?> profile(@PathVariable long userId) 
-	{
-
-		
-		Optional<UserDetail> user = userRepository.findById(userId);
-		
-		if(user.isEmpty()) {return new ResponseEntity<>("User not found"  , HttpStatus.NOT_FOUND);}
-		
-		List<UserPostSnippet> posts = postRepository.findAllByUserId(userId).stream()
-				.map(p -> new UserPostSnippet(p.getUserId() , 
-						p.getTitle() , 
-						p.getBody() , 
-						safeInstant(p.getCreated()),
-						safeInstant(p.getEdited()) , 
-						p.getCommentCount())
-						).toList();
-		
-		
-		List<CommentSnippet> comments = commentRepository.findAllByUserId(userId).stream()
-				.map(c -> new CommentSnippet(
-						c.getPostId() , 
-						c.getBody() , 
-						safeInstant(c.getCreated()),
-						safeInstant(c.getEdited()) , 
-						c.getEditCount())
-						).toList();
-		
-		
-		List<ReplySnippet> replies = replyRepository.findAllByUserId(userId).stream()
-				.map(r -> new ReplySnippet(
-						r.getPostId(),
-						r.getBody(),
-						safeInstant(r.getCreated()),
-						safeInstant(r.getEdited()) 
-						)
-					).toList();
-		
-		
-		
-		
-		UserProfileDto userProfile = new UserProfileDto(
-				
-				user.get().getId() , 
-				user.get().getName() , 
-				user.get().getProfilePhotoUrl(),
-				safeInstant(user.get().getCreated()),
-				user.get().getBio(),
-				posts,
-				comments,
-				replies
-				
-
-				);
-		
-		
-		
-		
-		return new ResponseEntity<>(userProfile	, HttpStatus.OK);
-	}
-	
-	
-	private Instant safeInstant(ZonedDateTime date) {
-	    return date != null ? date.toInstant() : null;
-	}
 	
 	
 	

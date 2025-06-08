@@ -3,6 +3,7 @@ package com.simulator.forum.model;
 
 public class RegisterForm {
 	
+	private String name;
 
 	private String email;
 
@@ -24,6 +25,14 @@ public class RegisterForm {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	@Override

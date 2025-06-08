@@ -40,9 +40,29 @@ public class AuthenticationController {
 	@PostMapping("/register")
 	public ResponseEntity<?> register(HttpServletRequest request , @ModelAttribute RegisterForm details) 
 	{
-		String email = details.getEmail();
+		String name;
 		
-		String password = details.getPassword();
+		String email;
+		
+		String password;
+		
+		try {
+			
+			name = details.getName();
+			
+			email = details.getEmail();
+			
+			password = details.getPassword();
+			
+			if(email == null || name == null || password == null) {
+				
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			
+		}catch(Exception e) {
+			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		
 		if(!validEmail(email)) 
 		{
@@ -59,14 +79,15 @@ public class AuthenticationController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		
 		String salt = generateSalt();
 		
 		String hash = hash(password , salt);
 		
 		String remoteAddr = request.getRemoteAddr();
 		
-		userRepository.createUser(email, remoteAddr, remoteAddr, salt, hash);	
+		
+		
+		userRepository.createUser(name , email, remoteAddr, remoteAddr, salt, hash);	
 		
 		return new ResponseEntity<>("Created"  , HttpStatus.OK);
 	}

@@ -31,6 +31,8 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.simulator.forum.entity.Oauth;
+import com.simulator.forum.repository.OauthRepository;
 import com.simulator.forum.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,6 +45,9 @@ public class Auth {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private OauthRepository oauthRepository;
 	
 	@Value("${oauth2.client.registration.google.client-id}")
 	private String clientId;
@@ -114,15 +119,36 @@ public class Auth {
 		email = payload.getEmail();
 		subject = payload.getSubject();
 		
-
 		
-		System.out.println(email  + " " + subject);
+		if(userRepository.emailExist(email))
+		{
+			if(!oauthRepository.emailExist(email)) 
+			{
+				
+				oauthRepository.save(new Oauth(email , subject));
+				//send cookie
+				
+			}
+		}
+		
+		
+		if(!userRepository.emailExist(email))
+		{
+			
+			userRepository.createUser("Bob" , email, request.getRemoteAddr(), 
+					request.getRemoteAddr(), "" , UUID.randomUUID().toString());
+			
+			if(!oauthRepository.emailExist(email)) 
+			{
+				oauthRepository.save(new Oauth(email , subject));
+				//send cookie
+					
+			}
+		}
 		
 		
 		
-		String remoteAddr = request.getRemoteAddr();
 		
-		userRepository.createUser("Bob" , email, remoteAddr, remoteAddr, "" , UUID.randomUUID().toString());
 		
 		return new ResponseEntity<>("ok"  , HttpStatus.OK);
 		

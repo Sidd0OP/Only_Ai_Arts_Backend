@@ -1,7 +1,11 @@
 package com.simulator.forum.controller;
 
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +16,18 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.simulator.forum.cloudflare.MediaService;
+import com.simulator.forum.entity.Reset;
 import com.simulator.forum.entity.UserDetail;
+import com.simulator.forum.mail.EmailSender;
 import com.simulator.forum.model.RegisterForm;
+import com.simulator.forum.model.update.PasswordUpdateForm;
+import com.simulator.forum.repository.ResetRepository;
 import com.simulator.forum.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,12 +38,125 @@ public class AuthenticationController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	
+	@Autowired
+	private ResetRepository resetRepository;
+	
+	@Autowired
+	EmailSender sender;
+	
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	
 	@GetMapping("/login")
 	public String login() 
 	{
 		return "login";
+	}
+	
+	@PostMapping("/valid")
+	public ResponseEntity<?> forgotPasswordEmail(@ModelAttribute PasswordUpdateForm data)
+	{
+		String email = data.getEmail();
+		String token = data.getToken();
+		String newPassword = data.getNewPassword();
+
+		Reset entity =  resetRepository.findByToken(token);
+		
+		if(entity ==  null) 
+		{
+			return new ResponseEntity<>("null" ,HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!validPassword(newPassword)) 
+		{
+			return new ResponseEntity<>("password"  , HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!entity.getEmail().equals(email)) 
+		{
+			return new ResponseEntity<>("email no match" , HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!entity.getToken().equals(token)) 
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if(Duration.between( entity.getTime() , ZonedDateTime.now()).toMinutes() < 10) 
+		{
+			return new ResponseEntity<>("duration" , HttpStatus.BAD_REQUEST);
+		}
+		
+		UserDetail user =  userRepository.findByEmail(email);
+		
+		String salt = generateSalt();
+		
+		String hash = hash(newPassword , salt);
+		
+//		String remoteAddr = request.getRemoteAddr();
+		
+		user.setPassword(hash);
+		user.setSalt(salt);
+		
+		userRepository.save(user);
+		
+		return new ResponseEntity<>("ok"  , HttpStatus.OK);
+	}
+	
+	@PostMapping("/token")
+	public ResponseEntity<?> forgotPasswordEmail(@RequestBody Map<String , String> emailContainer)
+	{
+		String email =  emailContainer.get("email");
+		
+		if(email == null) {
+			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!validEmail(email)) 
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if(newEmail(email)) 
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		
+		String token = UUID.randomUUID().toString();
+		
+		Reset entity = new Reset(email , token);
+		
+		try {
+			
+			resetRepository.save(entity);
+			
+		}catch(Exception e) {
+			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+		}
+		
+//		try {
+//			
+//			sendMail(email , token);
+//			
+//		}catch(Exception e) {
+//			
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//			
+//		}
+		
+		
+		return new ResponseEntity<>("ok"  , HttpStatus.OK);
+	}
+	
+	
+	private void sendMail(String mail , String token) 
+	{
+		sender.sendSimpleMessage(mail, "Forgot Password", token);
 	}
 	
 	@PostMapping("/register")

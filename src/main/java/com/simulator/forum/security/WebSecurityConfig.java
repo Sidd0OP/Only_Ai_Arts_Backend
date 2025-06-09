@@ -59,7 +59,9 @@ public class WebSecurityConfig {
 					"/profile/**",
 					"/user/**",
 					"/search/**",
-					"/auth/google/**").permitAll()
+					"/auth/google/**",
+					"/token/**",
+					"/valid/**").permitAll()
 			
 			.requestMatchers(
 					"/create" , 
@@ -81,7 +83,7 @@ public class WebSecurityConfig {
 			form
 			.loginPage("/login")
 			.permitAll()
-			.defaultSuccessUrl("/home", true);;
+			.defaultSuccessUrl("/home", true);
 		})
 		
 //		.formLogin(Customizer.withDefaults())

@@ -259,8 +259,6 @@ public class DescussionController {
 		
 		
 		Post entity = post.get();
-		
-		entity.setTitle(postUpdateDetails.getTitle());
 		entity.setBody(postUpdateDetails.getBody());
 		
 		try 

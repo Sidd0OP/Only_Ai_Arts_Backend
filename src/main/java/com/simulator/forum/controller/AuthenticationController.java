@@ -178,7 +178,7 @@ public class AuthenticationController {
 			
 			if(email == null || name == null || password == null) {
 				
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>("Incompelete details" , HttpStatus.BAD_REQUEST);
 			}
 			
 		}catch(Exception e) {
@@ -188,7 +188,7 @@ public class AuthenticationController {
 		
 		if(!validEmail(email)) 
 		{
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("invalid email" , HttpStatus.BAD_REQUEST);
 		}
 		
 		if(!newEmail(email)) 
@@ -198,7 +198,7 @@ public class AuthenticationController {
 		
 		if(!validPassword(password)) 
 		{
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("Invalid Password" , HttpStatus.BAD_REQUEST);
 		}
 		
 		String salt = generateSalt();

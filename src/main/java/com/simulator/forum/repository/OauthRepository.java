@@ -10,4 +10,6 @@ public interface OauthRepository extends JpaRepository<Oauth , Long>{
 	@NativeQuery(value = "select exists (select email from oauth where email = ?1)")
 	Boolean emailExist(String email);
 	
+	Oauth findByEmail(String email);
+	
 }

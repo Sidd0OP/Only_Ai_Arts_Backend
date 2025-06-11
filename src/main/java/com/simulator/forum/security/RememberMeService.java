@@ -1,71 +1,108 @@
 package com.simulator.forum.security;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.log.LogMessage;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.stereotype.Service;
 
-import com.simulator.forum.entity.Remember;
-import com.simulator.forum.repository.RememberMeRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+
 
 @Service
-public class RememberMeService implements PersistentTokenRepository 
-{
-	@Autowired
-	private RememberMeRepository repository;
-	
-	
+public class RememberMeService  extends AbstractRememberMeServices{
 	
 
-	@Override
-	public void createNewToken(PersistentRememberMeToken token) 
+	
+	private SecureRandom random;
+	
+	private PersistentRememberMeToken token;
+
+	public static final int DEFAULT_SERIES_LENGTH = 16;
+
+	public static final int DEFAULT_TOKEN_LENGTH = 16;
+
+	private int seriesLength = DEFAULT_SERIES_LENGTH;
+
+	private int tokenLength = DEFAULT_TOKEN_LENGTH;
+
+	@Autowired
+	public RememberMeService(DatabaseUserDetailService databaseUserDetailService) {
+		super("key", databaseUserDetailService);
+		
+		this.random = new SecureRandom();
+		
+	}
+	
+	
+	public PersistentRememberMeToken createCookie(HttpServletRequest request, HttpServletResponse response,
+			Authentication successfulAuthentication) 
 	{
 		
-		System.out.println(token.getSeries() + " " + token.getTokenValue() + " " + token.getUsername());
+		onLoginSuccess(request , response , successfulAuthentication);
 		
-		Remember entity = new Remember();
-		entity.setSeries(token.getSeries());
-		entity.setToken(token.getTokenValue());
-		entity.setDevice("test");
-		entity.setEmail(token.getUsername());
-		
-		repository.save(entity);
+		return this.token;
 	}
 
 	@Override
-	public void updateToken(String series, String tokenValue, Date lastUsed) {
+	protected void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
+			Authentication successfulAuthentication) {
 		
+		String username = successfulAuthentication.getName();
+		this.logger.debug(LogMessage.format("Creating new persistent login for user %s", username));
+		PersistentRememberMeToken persistentToken = new PersistentRememberMeToken(username, generateSeriesData(),
+				generateTokenData(), new Date());
 		
-		Remember entity = repository.findById(series).get();
-		entity.setToken(tokenValue);
-		repository.save(entity);
-
+		try {
+			System.out.println("SAVE COOKIE" + persistentToken.getSeries());
+//			this.rememberMeRepositoryService.createNewToken(persistentToken);
+			addCookie(persistentToken, request, response);
+		}
+		catch (Exception ex) {
+			this.logger.error("Failed to save persistent token ", ex);
+		}
+		
+		this.token = persistentToken;
 	}
 
 	@Override
-	public PersistentRememberMeToken getTokenForSeries(String seriesId) {
+	protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
+			HttpServletResponse response) throws RememberMeAuthenticationException, UsernameNotFoundException {
 		
+		System.out.println("Auto Login Called");
 		
-		
-		return repository.findById(seriesId)
-                .map(token -> new PersistentRememberMeToken(
-                        token.getEmail(),
-                        token.getSeries(),
-                        token.getToken(),
-                        Date.from(token.getLastUsed().toInstant()))
-                )
-                .orElse(null);
-		
-		
-	}
-
-	@Override
-	public void removeUserTokens(String username) {
-		
-		System.out.println("REMOVE TOKEN CALLED");
-		
+		return null;
 	}
 	
+	private void addCookie(PersistentRememberMeToken token, HttpServletRequest request, HttpServletResponse response) {
+		setCookie(new String[] { token.getSeries(), token.getTokenValue() }, getTokenValiditySeconds(), request,
+				response);
+	}
+
+	protected String generateSeriesData() {
+		byte[] newSeries = new byte[this.seriesLength];
+		this.random.nextBytes(newSeries);
+		return new String(Base64.getEncoder().encode(newSeries));
+	}
+
+	protected String generateTokenData() {
+		byte[] newToken = new byte[this.tokenLength];
+		this.random.nextBytes(newToken);
+		return new String(Base64.getEncoder().encode(newToken));
+	}
+
+
 }

@@ -11,6 +11,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,6 +25,9 @@ public class WebSecurityConfig {
 	private DatabaseUserDetailService databaseUserDetailService;
 	
 	@Autowired 
+	private CustomTokenRepository rememberMeRepositoryService;
+	
+	@Autowired
 	private RememberMeService rememberMeService;
 	
 	@Bean 
@@ -83,7 +87,8 @@ public class WebSecurityConfig {
 			form
 			.loginPage("/login")
 			.permitAll()
-			.defaultSuccessUrl("/home", true);
+			.defaultSuccessUrl("/user", true);
+			
 		})
 		
 //		.formLogin(Customizer.withDefaults())
@@ -98,7 +103,8 @@ public class WebSecurityConfig {
 		.rememberMe(remember -> 
 		
 		remember
-		.tokenRepository(rememberMeService)
+		.userDetailsService(databaseUserDetailService)
+		.tokenRepository(rememberMeRepositoryService)
 		.tokenValiditySeconds(1209600)
 		
 		)
@@ -119,6 +125,7 @@ public class WebSecurityConfig {
 		
 		return saltedAuthenticationProvider;
 	}
+	
 	
 	
 	

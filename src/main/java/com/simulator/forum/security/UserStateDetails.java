@@ -13,8 +13,8 @@ public class UserStateDetails implements UserDetails{
 
 	private static final long serialVersionUID = 1L;
 	
-	
 	private UserDetail user;
+
 
 	public UserStateDetails(UserDetail user)
 	{
@@ -43,6 +43,10 @@ public class UserStateDetails implements UserDetails{
 	public String getSalt() 
 	{
 		return user.getSalt();
+	}
+	
+	public UserDetail getUser() {
+		return user;
 	}
 
 }

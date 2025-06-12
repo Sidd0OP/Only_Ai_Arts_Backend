@@ -24,8 +24,8 @@ env:
   cloudflare_bucket: ${{ secrets.CLOUDFLARE_BUCKET }}
   cloudflare_publicUrl: ${{ secrets.CLOUDFLARE_PUBLICURL }}
   
-  google_client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
-  google_client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  google_client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
+  google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
 jobs:
 

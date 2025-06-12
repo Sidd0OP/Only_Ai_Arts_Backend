@@ -51,13 +51,13 @@ jobs:
     - name: Run docker container
       run: |
         docker run \
-            -e database_url=${{ secrets.DATABASE_URL }} \
-            -e cloudflare_token=${{ secrets.CLOUDFLARE_TOKEN }} \
-            -e cloudflare_endpoint=${{ secrets.CLOUDFLARE_ENDPOINT }} \
-            -e cloudflare_acessKey=${{ secrets.CLOUDFLARE_ACESSKEY }} \
-            -e cloudflare_secretKey=${{ secrets.CLOUDFLARE_SECRETKEY }} \
-            -e cloudflare_bucket=${{ secrets.CLOUDFLARE_BUCKET }} \
-            -e cloudflare_publicUrl=${{ secrets.CLOUDFLARE_PUBLICURL }} \
-            -e google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} \
-            -e google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+            -e database_url=$database_url \
+            -e cloudflare_token=$cloudflare_token \
+            -e cloudflare_endpoint=$cloudflare_endpoint \
+            -e cloudflare_acessKey=$cloudflare_acessKey \
+            -e cloudflare_secretKey=$cloudflare_secretKey \
+            -e cloudflare_bucket=$cloudflare_bucket \
+            -e cloudflare_publicUrl=$cloudflare_publicUrl \
+            -e google_client_id=$google_client_id \
+            -e google_client_secret=$google_client_secret \
             only-ai-art-server

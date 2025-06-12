@@ -16,6 +16,16 @@ on:
 
 env:
   database_url: ${{ secrets.DATABASE_URL }}
+  
+  cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+  cloudflare_endpoint: ${{ secrets.CLOUDFLARE_ENDPOINT }}
+  cloudflare_acessKey: ${{ secrets.CLOUDFLARE_ACESSKEY }}
+  cloudflare_secretKey: ${{ secrets.CLOUDFLARE_SECRETKEY }}
+  cloudflare_bucket: ${{ secrets.CLOUDFLARE_BUCKET }}
+  cloudflare_publicUrl: ${{ secrets.CLOUDFLARE_PUBLICURL }}
+  
+  google_client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
+  google_client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
 jobs:
 
@@ -32,7 +42,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn clean install -U
+      run: mvn clean install 
 
     
     

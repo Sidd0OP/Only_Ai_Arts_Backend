@@ -14,7 +14,11 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  database_url: ${secerets.DATABASE_URL}
+
 jobs:
+
   build:
 
     runs-on: ubuntu-latest

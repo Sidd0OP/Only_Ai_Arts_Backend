@@ -43,6 +43,8 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn clean install -U
+    - name : Create Docker Image
+      run: docker build -t only-ai-art-server . 
 
     
     

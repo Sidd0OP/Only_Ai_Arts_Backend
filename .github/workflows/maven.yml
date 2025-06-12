@@ -46,16 +46,6 @@ jobs:
     - name : Create Docker Image
       run: docker build -t only-ai-art-server . 
     - name : Run docker container 
-      run : |
-         docker run  -e database_url=${{ secrets.DATABASE_URL }} \
-                      -e cloudflare_token=${{ secrets.CLOUDFLARE_TOKEN }} \
-                      -e cloudflare_endpoint=${{ secrets.CLOUDFLARE_ENDPOINT }} \
-                      -e cloudflare_acessKey=${{ secrets.CLOUDFLARE_ACESSKEY }} \
-                      -e cloudflare_secretKey=${{ secrets.CLOUDFLARE_SECRETKEY }} \
-                      -e cloudflare_bucket=${{ secrets.CLOUDFLARE_BUCKET }} \
-                      -e cloudflare_publicUrl=${{ secrets.CLOUDFLARE_PUBLICURL }} \
-                      -e google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} \
-                      -e google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-                      only-ai-art-server
+      run : docker run  -e database_url=${{ secrets.DATABASE_URL }} -e cloudflare_token=${{ secrets.CLOUDFLARE_TOKEN }} -e cloudflare_endpoint=${{ secrets.CLOUDFLARE_ENDPOINT }} -e cloudflare_acessKey=${{ secrets.CLOUDFLARE_ACESSKEY }} -e cloudflare_secretKey=${{ secrets.CLOUDFLARE_SECRETKEY }} -e cloudflare_bucket=${{ secrets.CLOUDFLARE_BUCKET }} -e cloudflare_publicUrl=${{ secrets.CLOUDFLARE_PUBLICURL }} -e google_client_id=${{ secrets.GOOGLE_CLIENT_ID }} -e google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }} only-ai-art-server
     
     

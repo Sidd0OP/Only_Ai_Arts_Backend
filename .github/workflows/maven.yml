@@ -51,16 +51,16 @@ jobs:
     - name: Run docker container
       run: |
         container_id=$(docker run -d \
-          -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-          -e CLOUDFLARE_TOKEN=${{ secrets.CLOUDFLARE_TOKEN }} \
-          -e CLOUDFLARE_ENDPOINT=${{ secrets.CLOUDFLARE_ENDPOINT }} \
-          -e CLOUDFLARE_ACCESSKEY=${{ secrets.CLOUDFLARE_ACESSKEY }} \
-          -e CLOUDFLARE_SECRETKEY=${{ secrets.CLOUDFLARE_SECRETKEY }} \
-          -e CLOUDFLARE_BUCKET=${{ secrets.CLOUDFLARE_BUCKET }} \
-          -e CLOUDFLARE_PUBLICURL=${{ secrets.CLOUDFLARE_PUBLICURL }} \
-          -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-          -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-          only-ai-art-server)
+            -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            -e CLOUDFLARE_TOKEN=${{ secrets.CLOUDFLARE_TOKEN }} \
+            -e CLOUDFLARE_ENDPOINT=${{ secrets.CLOUDFLARE_ENDPOINT }} \
+            -e CLOUDFLARE_ACCESSKEY=${{ secrets.CLOUDFLARE_ACESSKEY }} \
+            -e CLOUDFLARE_SECRETKEY=${{ secrets.CLOUDFLARE_SECRETKEY }} \
+            -e CLOUDFLARE_BUCKET=${{ secrets.CLOUDFLARE_BUCKET }} \
+            -e CLOUDFLARE_PUBLICURL=${{ secrets.CLOUDFLARE_PUBLICURL }} \
+            -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+            -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+            only-ai-art-server)
         
         echo "Waiting for Spring Boot to start..."
         while ! docker logs $container_id | grep -q "Started Application"; do

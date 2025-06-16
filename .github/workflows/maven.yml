@@ -93,6 +93,23 @@ jobs:
           name: docker-image
           path: .
 
+      - name: Clear old tar file 
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          source: only-ai-art-server.tar
+          script: |
+            cd home/${{ secrets.USERNAME }}/container
+      
+            echo "Removing Docker image..."
+            docker image rm only-ai-art-server || echo "Image not found or in use"
+      
+            echo "Removing tar file..."
+            rm -f only-ai-art-server.tar
+        
       - name: Send Dockerfile to vm
         uses: appleboy/scp-action@master
         with:
@@ -102,6 +119,32 @@ jobs:
           port: ${{ secrets.PORT }}
           source: only-ai-art-server.tar
           target: "home/${{ secrets.USERNAME }}/container"
+
+          
+      - name: Creating env file 
+        run: |
+          echo "database_url=${{ secrets.DATABASE_URL }}" > .env
+          echo "cloudflare_token=${{ secrets.CLOUDFLARE_TOKEN }}" >> .env
+          echo "cloudflare_endpoint=${{ secrets.CLOUDFLARE_ENDPOINT }}" >> .env
+          echo "cloudflare_acessKey=${{ secrets.CLOUDFLARE_ACESSKEY }}" >> .env
+          echo "cloudflare_secretKey=${{ secrets.CLOUDFLARE_SECRETKEY }}" >> .env
+          echo "cloudflare_bucket=${{ secrets.CLOUDFLARE_BUCKET }}" >> .env
+          echo "cloudflare_publicUrl=${{ secrets.CLOUDFLARE_PUBLICURL }}" >> .env
+          echo "google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+
+          
+      - name: Sending env file to start container 
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          source: .env
+          target: "home/${{ secrets.USERNAME }}/container"
+
+      
           
     
       

@@ -72,12 +72,27 @@ jobs:
         docker logs $CONTAINER_ID
 
         docker save -o only-ai-art-server.tar only-ai-art-server
+        
+    - name: Upload Docker image as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: only-ai-art-server.tar
 
   deploy: 
     needs: build
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: .
+
       - name: Send Dockerfile to vm
         uses: appleboy/scp-action@master
         with:
@@ -85,7 +100,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          source: "only-ai-art-server.tar"
+          source: only-ai-art-server.tar
           target: "/container"
           
     

@@ -50,23 +50,24 @@ jobs:
       
     - name: Run docker container
       run: |
-        container_id=$(docker run -d \
-            -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-            -e CLOUDFLARE_TOKEN=${{ secrets.CLOUDFLARE_TOKEN }} \
-            -e CLOUDFLARE_ENDPOINT=${{ secrets.CLOUDFLARE_ENDPOINT }} \
-            -e CLOUDFLARE_ACCESSKEY=${{ secrets.CLOUDFLARE_ACESSKEY }} \
-            -e CLOUDFLARE_SECRETKEY=${{ secrets.CLOUDFLARE_SECRETKEY }} \
-            -e CLOUDFLARE_BUCKET=${{ secrets.CLOUDFLARE_BUCKET }} \
-            -e CLOUDFLARE_PUBLICURL=${{ secrets.CLOUDFLARE_PUBLICURL }} \
-            -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-            -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-            only-ai-art-server)
+        docker run \
+            -e database_url=$database_url \
+            -e cloudflare_token=$cloudflare_token \
+            -e cloudflare_endpoint=$cloudflare_endpoint \
+            -e cloudflare_acessKey=$cloudflare_acessKey \
+            -e cloudflare_secretKey=$cloudflare_secretKey \
+            -e cloudflare_bucket=$cloudflare_bucket \
+            -e cloudflare_publicUrl=$cloudflare_publicUrl \
+            -e google_client_id=$google_client_id \
+            -e google_client_secret=$google_client_secret \
+            only-ai-art-server
         
         echo "Waiting for Spring Boot to start..."
-        while ! docker logs $container_id | grep -q "Started Application"; do
+        sleep 10
+        while ! docker logs $container_id | grep -q "started"; do
             sleep 2
         done
     
         echo "Spring Boot started, stopping container..."
-        docker stop $container_id
+        docker stop $(docker ps -q)
       

@@ -50,7 +50,7 @@ jobs:
       
     - name: Run docker container
       run: |
-        docker run \
+        docker run -d \
             -e database_url=$database_url \
             -e cloudflare_token=$cloudflare_token \
             -e cloudflare_endpoint=$cloudflare_endpoint \
@@ -64,7 +64,7 @@ jobs:
         
         echo "Waiting for Spring Boot to start..."
         sleep 10
-        while ! docker logs $container_id | grep -q "started"; do
+        while ! docker logs $container_id | grep -q " Started ForumApplication "; do
             sleep 2
         done
     

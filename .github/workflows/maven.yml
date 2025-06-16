@@ -50,7 +50,7 @@ jobs:
       
     - name: Run docker container
       run: |
-        docker run -d \
+        CONTAINER_ID=$(docker run -d \
             -e database_url=$database_url \
             -e cloudflare_token=$cloudflare_token \
             -e cloudflare_endpoint=$cloudflare_endpoint \
@@ -60,11 +60,14 @@ jobs:
             -e cloudflare_publicUrl=$cloudflare_publicUrl \
             -e google_client_id=$google_client_id \
             -e google_client_secret=$google_client_secret \
-            only-ai-art-server
+            only-ai-art-server)
         
         echo "Waiting for docker to run appplication"
         sleep 5
         
         echo "Stopping container"
         docker stop $(docker ps -a -q)
+
+        echo "Fetching container logs"
+        docker logs $CONTAINER_ID
       

@@ -43,7 +43,7 @@ jobs:
         cache: maven
         
     - name: Build with Maven
-      run: mvn clean install -U
+      run: mvn clean install 
       
     - name : Create Docker Image
       run: docker build -t only-ai-art-server . 
@@ -70,4 +70,23 @@ jobs:
 
         echo "Fetching container logs"
         docker logs $CONTAINER_ID
+
+        docker save -o only-ai-art-server.tar only-ai-art-server
+
+  deploy: 
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Dockerfile to vm
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          source: "only-ai-art-server.tar"
+          target: "/container"
+          
+    
       

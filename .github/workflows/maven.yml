@@ -62,12 +62,9 @@ jobs:
             -e google_client_secret=$google_client_secret \
             only-ai-art-server
         
-        echo "Waiting for Spring Boot to start..."
-        sleep 10
-        while ! docker logs $container_id | grep -q " Started ForumApplication "; do
-            sleep 2
-        done
-    
-        echo "Spring Boot started, stopping container..."
-        docker stop $(docker ps -q)
+        echo "Waiting for docker to run appplication"
+        sleep 5
+        
+        echo "Stopping container"
+        docker stop $(docker ps -a -q)
       

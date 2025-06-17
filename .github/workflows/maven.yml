@@ -162,6 +162,8 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
+            cd container 
+            
             docker load --input only-ai-art-server.tar
 
       - name: Start new docker image
@@ -172,6 +174,8 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
+            cd container 
+            
             docker run --env-file .env -d -p 8080:8080 only-ai-art-server
 
       - name: Remove the .env file

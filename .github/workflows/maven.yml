@@ -151,6 +151,8 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
+            docker ps -q | xargs -r docker stop
+            
             docker system prune -a -f
       
 

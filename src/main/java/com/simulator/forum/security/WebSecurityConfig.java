@@ -35,7 +35,7 @@ public class WebSecurityConfig {
 	{
 		CorsConfiguration config = new CorsConfiguration();
 		
-		config.setAllowedOrigins(List.of("http://localhost:5173"));
+		config.setAllowedOrigins(List.of("http://localhost:5173","https://onlyaiarts.com"));
 		config.setAllowedMethods(List.of("GET" , "POST" , "PATCH"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);
@@ -74,7 +74,8 @@ public class WebSecurityConfig {
 					"/comment/**" , 
 					"/reply/**",
 					"/upload/profile",
-					"/heart/**").authenticated();
+					"/heart/**",
+					"/bio/**").authenticated();
 		})
 		.cors(c -> c.configurationSource(CorsConfiguration()))
 		

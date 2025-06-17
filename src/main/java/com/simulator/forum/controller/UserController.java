@@ -183,5 +183,29 @@ public class UserController {
 			}
 		
 	}
+	
+	@PostMapping("/bio")
+	public ResponseEntity<?> addBio(@RequestParam("bio") String bio)
+	{
+		UserDetail user =  findUserFromSession();
+		
+		if(user == null) 
+		{
+			return new ResponseEntity<>("Not a user" , HttpStatus.FORBIDDEN);
+		}
+		
+		try 
+		{
+			
+			user.setBio(bio);
+			userRepository.save(user);
+			
+			return new ResponseEntity<>("Saved"  , HttpStatus.OK);
+			
+		}catch(Exception e) 
+		{
+			return new ResponseEntity<>("Failed"  , HttpStatus.BAD_REQUEST);
+		}
+	}
 
 }

@@ -43,14 +43,14 @@ jobs:
         cache: maven
         
     - name: Build with Maven
-      run: mvn clean install -U
+      run: mvn clean install 
       
     - name : Create Docker Image
       run: docker build -t only-ai-art-server . 
       
     - name: Run docker container
       run: |
-        docker run \
+        CONTAINER_ID=$(docker run -d \
             -e database_url=$database_url \
             -e cloudflare_token=$cloudflare_token \
             -e cloudflare_endpoint=$cloudflare_endpoint \
@@ -60,4 +60,90 @@ jobs:
             -e cloudflare_publicUrl=$cloudflare_publicUrl \
             -e google_client_id=$google_client_id \
             -e google_client_secret=$google_client_secret \
-            only-ai-art-server
+            only-ai-art-server)
+        
+        echo "Waiting for docker to run appplication"
+        sleep 5
+        
+        echo "Stopping container"
+        docker stop $(docker ps -a -q)
+
+        echo "Fetching container logs"
+        docker logs $CONTAINER_ID
+
+        docker save -o only-ai-art-server.tar only-ai-art-server
+        
+    - name: Upload Docker image as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: only-ai-art-server.tar
+
+  deploy: 
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: .
+
+      - name: Clear old tar file 
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd container
+      
+            echo "Removing Docker image..."
+            docker image rm only-ai-art-server || echo "Image not found or in use"
+      
+            echo "Removing tar file..."
+            rm -f only-ai-art-server.tar
+        
+      - name: Send Dockerfile to vm
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          source: only-ai-art-server.tar
+          target: "container"
+
+          
+      - name: Creating env file 
+        run: |
+          echo "database_url=${{ secrets.DATABASE_URL }}" > .env
+          echo "cloudflare_token=${{ secrets.CLOUDFLARE_TOKEN }}" >> .env
+          echo "cloudflare_endpoint=${{ secrets.CLOUDFLARE_ENDPOINT }}" >> .env
+          echo "cloudflare_acessKey=${{ secrets.CLOUDFLARE_ACESSKEY }}" >> .env
+          echo "cloudflare_secretKey=${{ secrets.CLOUDFLARE_SECRETKEY }}" >> .env
+          echo "cloudflare_bucket=${{ secrets.CLOUDFLARE_BUCKET }}" >> .env
+          echo "cloudflare_publicUrl=${{ secrets.CLOUDFLARE_PUBLICURL }}" >> .env
+          echo "google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+
+          
+      - name: Sending env file to start container 
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          source: .env
+          target: "container"
+
+      
+          
+    
+      

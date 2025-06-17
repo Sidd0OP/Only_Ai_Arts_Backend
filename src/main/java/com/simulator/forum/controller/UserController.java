@@ -73,7 +73,7 @@ public class UserController {
 		{
 			UserLoginDto userData = new UserLoginDto(null , null , null);
 			
-			return new ResponseEntity<>(userData , HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>(userData , HttpStatus.NOT_FOUND);
 		}
 		
 		UserLoginDto userData = new UserLoginDto(user.getId() , user.getName() , user.getProfilePhotoUrl());

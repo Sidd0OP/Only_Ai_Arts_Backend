@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public record ReplySnippet(
 		
-		Long postId,
+		Long replyId,
 		String body,
 		Instant created,
 		Instant edited

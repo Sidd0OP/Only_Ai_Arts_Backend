@@ -102,7 +102,8 @@ public class UserController {
 		if(user.isEmpty()) {return new ResponseEntity<>("User not found"  , HttpStatus.NOT_FOUND);}
 		
 		List<UserPostSnippet> posts = postRepository.findAllByUserId(userId).stream()
-				.map(p -> new UserPostSnippet(p.getUserId() , 
+				.map(p -> new UserPostSnippet(
+						p.getId() , 
 						p.getTitle() , 
 						p.getBody() , 
 						safeInstant(p.getCreated()),
@@ -113,7 +114,8 @@ public class UserController {
 		
 		List<CommentSnippet> comments = commentRepository.findAllByUserId(userId).stream()
 				.map(c -> new CommentSnippet(
-						c.getPostId() , 
+						c.getPostId() ,
+						c.getId(),
 						c.getBody() , 
 						safeInstant(c.getCreated()),
 						safeInstant(c.getEdited()) , 
@@ -123,7 +125,7 @@ public class UserController {
 		
 		List<ReplySnippet> replies = replyRepository.findAllByUserId(userId).stream()
 				.map(r -> new ReplySnippet(
-						r.getPostId(),
+						r.getId(),
 						r.getBody(),
 						safeInstant(r.getCreated()),
 						safeInstant(r.getEdited()) 

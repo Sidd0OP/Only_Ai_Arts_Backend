@@ -13,9 +13,12 @@ public record HomePostSnippet(
 		Integer commentCount,
 		String imageUrl,
 		Integer heart,
+		String model,
+		Boolean rated,
 		Long userId,
 		String userName,
-		String profliePhotoUrl
+		String profliePhotoUrl,
+		String tags
 		
 		) {
 

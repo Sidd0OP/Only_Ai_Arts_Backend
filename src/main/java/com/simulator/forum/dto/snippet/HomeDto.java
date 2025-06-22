@@ -4,6 +4,7 @@ import java.util.List;
 
 public record HomeDto(
 			
+			List<Long> heartedPost,
 			List<HomePostSnippet> latestPostSnippets,
 			List<HomePostSnippet> postSnippets
 			

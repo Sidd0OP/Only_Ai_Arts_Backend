@@ -29,11 +29,21 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			p.comment_count , 
 			p.image_url ,
 			p.heart,
+			p.model,
+			p.rated,
 			u.id as user_id , 
 			u.name ,
-			u.profile_photo_url 
-			from post p join user_detail u on
+			u.profile_photo_url,
+			string_agg(t.text, ',') AS tags
+			from post p 
+			join user_detail u on
 			p.user_id = u.id
+			LEFT join tag t on 
+			p.id = t.post_id
+			GROUP BY 
+		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
+		    p.image_url, p.heart, p.model, p.rated,
+		    u.id, u.name, u.profile_photo_url
 			order by p.heart desc , p.created desc , p.comment_count desc
 			limit 20
 			offset ?1;
@@ -55,11 +65,21 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			p.comment_count , 
 			p.image_url ,
 			p.heart,
+			p.model,
+			p.rated,
 			u.id as user_id , 
 			u.name ,
-			u.profile_photo_url 
-			from post p join user_detail u on
+			u.profile_photo_url,
+			string_agg(t.text, ',') AS tags
+			from post p 
+			join user_detail u on
 			p.user_id = u.id
+			LEFT join tag t on 
+			p.id = t.post_id
+			GROUP BY 
+		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
+		    p.image_url, p.heart, p.model, p.rated,
+		    u.id, u.name, u.profile_photo_url
 			order by p.created desc 
 			limit 10;
 			
@@ -73,17 +93,30 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	
 	@Query(value =  """
 			
-			select p.id as post_id , 
-			p.user_id , 
+			select 
+			p.id as post_id, 
 			p.title , 
-			p.body , 
-			p.created , 
+			p.body ,
+			p.created ,
 			p.edited , 
 			p.comment_count , 
 			p.image_url ,
-			u.name , 
-			u.profile_photo_url 
-			from post p join user_detail u on p.user_id = u.id and p.id = ?1
+			p.heart,
+			p.model,
+			p.rated,
+			u.id as user_id , 
+			u.name ,
+			u.profile_photo_url,
+			string_agg(t.text, ',') AS tags
+			from post p 
+			join user_detail u on
+			p.user_id = u.id and p.id = ?1
+			LEFT join tag t on 
+			p.id = t.post_id
+			GROUP BY 
+		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
+		    p.image_url, p.heart, p.model, p.rated,
+		    u.id, u.name, u.profile_photo_url
 			
 			""" , nativeQuery = true)
 	Optional<PostDto> getPostSnippetFromId(long postId);
@@ -91,12 +124,10 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	
 	@Query(value =  """
 			
-			select add_post(?1 , ?2 , ?3 , ?4);
+			select add_post(?1 , ?2 , ?3 , ?4 , ?5 , ?6);
 			
 			""" , nativeQuery = true)
-	@Modifying
-	@Transactional
-	Object[] createNewPost(long userId , String title , String body , String imageUrl);
+	Long createNewPost(long userId , String title , String body , String imageUrl , String model , Boolean rated);
 	
 	
 	
@@ -106,6 +137,8 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			
 			""" , nativeQuery = true)
 	Integer updatePost(long postId);
+	
+	
 	
 	
 	

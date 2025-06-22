@@ -4,6 +4,9 @@ public class PostForm {
 
 	private String title ;
 	private String body ;
+	private String tags;
+	private boolean rated;
+	private String model;
 
 
 	public String getTitle() {
@@ -17,5 +20,23 @@ public class PostForm {
 	}
 	public void setBody(String body) {
 		this.body = body;
+	}
+	public String getTags() {
+		return tags;
+	}
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
+	public boolean isRated() {
+		return rated;
+	}
+	public void setRated(boolean rated) {
+		this.rated = rated;
+	}
+	public String getModel() {
+		return model;
+	}
+	public void setModel(String model) {
+		this.model = model;
 	}
 }

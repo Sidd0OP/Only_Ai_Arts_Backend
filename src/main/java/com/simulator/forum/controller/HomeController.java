@@ -1,40 +1,25 @@
 package com.simulator.forum.controller;
 
 
-import java.security.Principal;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.simulator.forum.dto.UserProfileDto;
-import com.simulator.forum.dto.snippet.CommentSnippet;
 import com.simulator.forum.dto.snippet.HomeDto;
 import com.simulator.forum.dto.snippet.HomePostSnippet;
-import com.simulator.forum.dto.snippet.ReplySnippet;
-import com.simulator.forum.dto.snippet.UserPostSnippet;
-import com.simulator.forum.entity.Comment;
-import com.simulator.forum.entity.Post;
-import com.simulator.forum.entity.Reply;
 import com.simulator.forum.entity.UserDetail;
-import com.simulator.forum.repository.CommentRepository;
+import com.simulator.forum.repository.HeartRepository;
 import com.simulator.forum.repository.PostRepository;
-import com.simulator.forum.repository.ReplyRepository;
 import com.simulator.forum.repository.UserRepository;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 public class HomeController {
@@ -45,14 +30,42 @@ public class HomeController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private HeartRepository heartRepository;
 	
 	
-	
+	private UserDetail findUserFromSession() 
+	{
+		Authentication  authObject  = SecurityContextHolder.getContext().getAuthentication();
+			
+		
+		if(authObject != null && authObject.isAuthenticated()) 
+		{
+			UserDetail authenticatedUser = userRepository.findByEmail(authObject.getName());
+			
+			return authenticatedUser;
+			
+		}else {return null;}
+	}
 
 	@GetMapping("/home")
 	public ResponseEntity<?> home() 
 	{	
-		HomeDto homeData = new HomeDto(postRepository.getLatestPostSnippets(), postRepository.getPostSnippets(0));
+		
+		UserDetail user =  findUserFromSession();
+		
+		List<Long> heartedPosts = List.of();
+		
+		
+		if(user != null) 
+		{
+			long userId = user.getId();
+			heartedPosts = heartRepository.getHeartedPost(userId);
+		}
+		
+		
+		
+		HomeDto homeData = new HomeDto(heartedPosts , postRepository.getLatestPostSnippets(), postRepository.getPostSnippets(0));
 		
 		return new ResponseEntity<>(homeData  , HttpStatus.OK);
 	}
@@ -65,13 +78,10 @@ public class HomeController {
 		
 		try {
 			
-			searchResult = postRepository.searchPost(query);
-			
-			
+			searchResult = postRepository.searchPost(query);	
 			
 		}catch(Exception e) {
 			
-		
 			searchResult = List.of();
 		}
 		
@@ -110,6 +120,8 @@ public class HomeController {
 	@GetMapping("/snippets/{page}")
 	public ResponseEntity<?> loadMore(@PathVariable String page)
 	{
+		
+		
 		if(page == null) 
 		{
 			return new ResponseEntity<>("format = snippets/page"  , HttpStatus.BAD_REQUEST);
@@ -126,7 +138,7 @@ public class HomeController {
 			return new ResponseEntity<>("numeric parameter required"  , HttpStatus.BAD_REQUEST);
 		}
 		
-		return new ResponseEntity<>(postRepository.getPostSnippets(pageNumber)  , HttpStatus.OK);
+		return new ResponseEntity<>(postRepository.getPostSnippets(pageNumber) , HttpStatus.OK);
 	}
 	
 	

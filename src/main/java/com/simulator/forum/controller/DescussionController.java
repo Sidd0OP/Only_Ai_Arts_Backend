@@ -1,8 +1,9 @@
 package com.simulator.forum.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import com.simulator.forum.dto.snippet.HomePostSnippet;
 import com.simulator.forum.entity.Comment;
 import com.simulator.forum.entity.Post;
 import com.simulator.forum.entity.Reply;
+import com.simulator.forum.entity.Tag;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.model.CommentForm;
 import com.simulator.forum.model.PostForm;
@@ -39,6 +41,7 @@ import com.simulator.forum.repository.CommentRepository;
 import com.simulator.forum.repository.HeartRepository;
 import com.simulator.forum.repository.PostRepository;
 import com.simulator.forum.repository.ReplyRepository;
+import com.simulator.forum.repository.TagRepository;
 import com.simulator.forum.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,6 +63,9 @@ public class DescussionController {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private TagRepository tagRepository;
 	
 	@Autowired
 	MediaService mediaSerive;
@@ -89,6 +95,7 @@ public class DescussionController {
 		UserDetail user =  findUserFromSession();	
 		
 		boolean postEditable = false;
+		boolean hearted = false;
 				
 		Optional<PostDto> post = postRepository.getPostSnippetFromId(postId);
 		
@@ -102,7 +109,6 @@ public class DescussionController {
 		List<ReplyDto> replies = replyRepository.getAllReplies(postId);
 		
 
-		
 		List<CommentReplyDto> commentReplies = comments.stream()
 				.map(c -> 
 						new CommentReplyDto
@@ -133,9 +139,17 @@ public class DescussionController {
 				
 			}
 			
+			if(heartRepository.hasUserHearted(post.get().postId() , userId)) {
+				
+				hearted =  true;
+			}
+			
 			PostCommentReplyDto postCommentReplyDto = new PostCommentReplyDto
 					(
+							
 							postEditable,
+							
+							hearted,
 							
 							comments.stream()
 							.filter( c -> c.userId() == userId)
@@ -160,11 +174,12 @@ public class DescussionController {
 				
 
 		return new ResponseEntity<>(new PostCommentReplyDto(false ,
-														List.of() , 
-														List.of() , 
-														post.get() , 
-														commentReplies,
-														similarPost) , HttpStatus.OK);
+															hearted,
+															List.of() , 
+															List.of() , 
+															post.get() , 
+															commentReplies,
+															similarPost) , HttpStatus.OK);
 		
 	}
 	
@@ -228,13 +243,22 @@ public class DescussionController {
 		
 		try 
 		{
-			postRepository.createNewPost(
-					user.getId() , 
-					postDetails.getTitle() , 
-					postDetails.getBody() , 
-					url);
+			Long id = postRepository.createNewPost(
+										user.getId() , 
+										postDetails.getTitle() , 
+										postDetails.getBody() , 
+										url,
+										postDetails.getModel(),
+										postDetails.isRated());
 			
-			return new ResponseEntity<>("Insert Sucessful"  , HttpStatus.OK);
+			List<Tag> tags = Arrays.stream(postDetails.getTags().split("#"))
+				    .filter(tag -> !tag.trim().isEmpty()) 
+				    .map(tag -> new Tag(id , tag.trim()))
+				    .collect(Collectors.toList());
+			
+			tagRepository.saveAll(tags);
+			
+			return new ResponseEntity<>(id  , HttpStatus.OK);
 			
 		}catch(Exception e) 
 		{

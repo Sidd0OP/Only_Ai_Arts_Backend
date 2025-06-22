@@ -18,6 +18,12 @@ public class Tag {
 	
 	private String text;
 	
+	public Tag(long postId , String tag) {
+		
+		this.postId = postId;
+		this.text = tag;
+	}
+
 	public long getId() {
 		return id;
 	}

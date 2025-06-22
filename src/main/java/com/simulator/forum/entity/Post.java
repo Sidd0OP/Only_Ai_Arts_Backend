@@ -36,6 +36,8 @@ public class Post {
 	private String imageUrl;
 	
 	private Integer heart;
+
+	private Boolean rated;
 	
 	
 	
@@ -110,6 +112,22 @@ public class Post {
 
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+	
+	public Integer getHeart() {
+		return heart;
+	}
+
+	public void setHeart(Integer heart) {
+		this.heart = heart;
+	}
+
+	public Boolean getRated() {
+		return rated;
+	}
+
+	public void setRated(Boolean rated) {
+		this.rated = rated;
 	}
 
 }

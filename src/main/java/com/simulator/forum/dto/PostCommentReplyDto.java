@@ -7,6 +7,8 @@ import com.simulator.forum.dto.snippet.HomePostSnippet;
 public record PostCommentReplyDto
 	(
 			boolean postEditableByUser,
+			boolean hearted,
+			
 			List<Long> listOfEditableComments,
 			List<Long> listOfEditableReplies,
 			

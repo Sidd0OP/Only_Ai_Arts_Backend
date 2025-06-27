@@ -8,18 +8,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailSender {
 
-	@Autowired
-    private JavaMailSender emailSender;
+//	@Autowired
+//    private JavaMailSender emailSender;
 	
 	public void sendSimpleMessage(String to, String subject, String text) 
 	{
 		        
-		        SimpleMailMessage message = new SimpleMailMessage(); 
-		        message.setFrom("siddharth16529@gmail.com");
-		        message.setTo(to); 
-		        message.setSubject(subject); 
-		        message.setText(text);
-		        emailSender.send(message);
+//		        SimpleMailMessage message = new SimpleMailMessage(); 
+//		        message.setFrom("siddharth16529@gmail.com");
+//		        message.setTo(to); 
+//		        message.setSubject(subject); 
+//		        message.setText(text);
+//		        emailSender.send(message);
 		       
 	}
 }

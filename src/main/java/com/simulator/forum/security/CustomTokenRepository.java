@@ -21,7 +21,6 @@ public class CustomTokenRepository implements PersistentTokenRepository
 	public void createNewToken(PersistentRememberMeToken token) 
 	{
 		
-		System.out.println(token.getSeries() + " " + token.getTokenValue() + " " + token.getUsername());
 		
 		Remember entity = new Remember();
 		entity.setSeries(token.getSeries());
@@ -36,7 +35,7 @@ public class CustomTokenRepository implements PersistentTokenRepository
 	public void updateToken(String series, String tokenValue, Date lastUsed) {
 		
 		
-		System.out.println("COOKIE GOT UPDATED" +  tokenValue);
+		
 		Remember entity = repository.findById(series).get();
 		entity.setToken(tokenValue);
 		repository.save(entity);

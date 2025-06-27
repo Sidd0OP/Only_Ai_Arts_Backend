@@ -2,8 +2,8 @@ package com.simulator.forum.model;
 
 public class PostForm {
 
-	private String title ;
-	private String body ;
+	private String title;
+	private String body;
 	private String tags;
 	private boolean rated;
 	private String model;

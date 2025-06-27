@@ -52,7 +52,7 @@ public class SaltedAuthenticationProvider implements AuthenticationProvider{
 		
 		if(!passwordEncoder.matches(password + user.getSalt(), saltedDatabasePassword)) 
 		{
-			System.out.println("PASSWORDS DONT MATCH EXCEPTION WILL BE THROWN");
+//			System.out.println("PASSWORDS DONT MATCH EXCEPTION WILL BE THROWN");
 			throw new AuthenticationException("Password do not match") {
 				private static final long serialVersionUID = 1L;};
 		}
@@ -72,13 +72,13 @@ public class SaltedAuthenticationProvider implements AuthenticationProvider{
 						
 						);
 				
-				System.out.println("Cleaned user");
+//				System.out.println("Cleaned user");
 			}
 		}
 		
 		Authentication authenticationObject = new UsernamePasswordAuthenticationToken(user , saltedPassword , user.getAuthorities());
 		
-		System.out.println("USER IS EXISTING AND IS AUTHENTICATED");
+//		System.out.println("USER IS EXISTING AND IS AUTHENTICATED");
 		return authenticationObject;
 	}
 

@@ -251,6 +251,8 @@ public class DescussionController {
 										postDetails.getModel(),
 										postDetails.isRated());
 			
+			
+			
 			List<Tag> tags = Arrays.stream(postDetails.getTags().split("#"))
 				    .filter(tag -> !tag.trim().isEmpty()) 
 				    .map(tag -> new Tag(id , tag.trim()))

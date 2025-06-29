@@ -65,7 +65,8 @@ public class WebSecurityConfig {
 					"/search/**",
 					"/auth/google/**",
 					"/token/**",
-					"/valid/**").permitAll()
+					"/valid/**",
+					"/gallery/**").permitAll()
 			
 			.requestMatchers(
 					"/create" , 

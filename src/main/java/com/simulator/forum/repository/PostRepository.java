@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.simulator.forum.dto.PostDto;
+import com.simulator.forum.dto.snippet.GallerySnippet;
 import com.simulator.forum.dto.snippet.HomePostSnippet;
 import com.simulator.forum.entity.Post;
 
@@ -21,12 +22,7 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	@Query(value =  """
 			
 			select 
-			p.id as post_id, 
-			p.title , 
-			p.body ,
-			p.created ,
-			p.edited , 
-			p.comment_count , 
+			p.id as post_id,  
 			p.image_url ,
 			p.heart,
 			p.model,
@@ -50,6 +46,20 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			
 			""" , nativeQuery = true)
 	List<HomePostSnippet> getPostSnippets(int offset);
+	
+	@Query(value =  """
+			
+			select 
+			p.id as post_id, 
+			p.title , 
+			p.image_url
+			from post p 
+			order by p.heart desc , p.created desc , p.comment_count desc
+			limit 40
+			offset ?1;
+			
+			""" , nativeQuery = true)
+	List<GallerySnippet> getGallerySnippets(int offset);
 	
 	
 	

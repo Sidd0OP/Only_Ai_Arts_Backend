@@ -22,7 +22,12 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	@Query(value =  """
 			
 			select 
-			p.id as post_id,  
+			p.id as post_id, 
+			p.title , 
+			p.body ,
+			p.created ,
+			p.edited , 
+			p.comment_count , 
 			p.image_url ,
 			p.heart,
 			p.model,

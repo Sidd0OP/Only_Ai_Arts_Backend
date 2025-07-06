@@ -17,6 +17,25 @@ import com.simulator.forum.entity.Post;
 
 
 public interface PostRepository extends JpaRepository<Post , Long>{
+	
+	List<Post> findAllByUserId(long userId);
+	
+	
+	@Query(value =  """
+			
+			select 
+			DISTINCT model 
+			from (
+				select  model , heart , comment_count from post 
+				where model is not null AND TRIM(model) <> '' 
+				order by heart desc ,
+				comment_count desc
+				limit 5
+			);
+
+			
+			""" , nativeQuery = true)
+	List<String> getTrendingTool();
 
 	
 	@Query(value =  """
@@ -102,7 +121,39 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	List<HomePostSnippet> getLatestPostSnippets();
 	
 	
-	List<Post> findAllByUserId(long userId);
+	
+	@Query(value =  """
+			
+			SELECT 
+		    p.id AS post_id, 
+		    p.title, 
+		    p.body,
+		    p.created,
+		    p.edited, 
+		    p.comment_count, 
+		    p.image_url,
+		    p.heart,
+		    p.model,
+		    p.rated,
+		    u.id AS user_id, 
+		    u.name,
+		    u.profile_photo_url,
+		    string_agg(t.text, ',') AS tags
+			FROM post p
+			JOIN user_detail u ON p.user_id = u.id
+			LEFT JOIN tag t ON p.id = t.post_id
+			WHERE EXISTS (
+			    SELECT 1 FROM tag t2 WHERE t2.post_id = p.id AND t2.text ILIKE ?1 
+			)
+			GROUP BY 
+		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
+		    p.image_url, p.heart, p.model, p.rated,
+		    u.id, u.name, u.profile_photo_url
+			ORDER BY p.heart DESC, p.created DESC, p.comment_count DESC
+			LIMIT 20 OFFSET ?2;
+			
+			""" , nativeQuery = true)
+	List<HomePostSnippet> getPostSnippetsFromTag(String tag , Integer offset);
 	
 	
 	
@@ -135,6 +186,12 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			
 			""" , nativeQuery = true)
 	Optional<PostDto> getPostSnippetFromId(long postId);
+	
+	
+	
+	
+
+	
 	
 	
 	@Query(value =  """

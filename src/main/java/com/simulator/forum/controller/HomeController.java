@@ -18,6 +18,7 @@ import com.simulator.forum.dto.snippet.HomePostSnippet;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.repository.HeartRepository;
 import com.simulator.forum.repository.PostRepository;
+import com.simulator.forum.repository.TagRepository;
 import com.simulator.forum.repository.UserRepository;
 
 
@@ -32,6 +33,9 @@ public class HomeController {
 	
 	@Autowired
 	private HeartRepository heartRepository;
+	
+	@Autowired
+	private TagRepository tagRepository;
 	
 	
 	private UserDetail findUserFromSession() 
@@ -65,7 +69,11 @@ public class HomeController {
 		
 		
 		
-		HomeDto homeData = new HomeDto(heartedPosts , postRepository.getLatestPostSnippets(), postRepository.getPostSnippets(0));
+		HomeDto homeData = new HomeDto(	postRepository.getTrendingTool(),
+										tagRepository.getTrendingTags() ,
+										heartedPosts , 
+										postRepository.getLatestPostSnippets(), 
+										postRepository.getPostSnippets(0));
 		
 		return new ResponseEntity<>(homeData  , HttpStatus.OK);
 	}
@@ -114,6 +122,31 @@ public class HomeController {
 		return "redirect:/error";
 	}
 	
+	
+	@GetMapping("/tags/{tag}/{page}")
+	public ResponseEntity<?> loadPostFromTags(@PathVariable String tag , @PathVariable String page)
+	{
+		
+		
+		if(page == null) 
+		{
+			return new ResponseEntity<>("format = snippets/page"  , HttpStatus.BAD_REQUEST);
+		}
+		
+		int pageNumber;
+	
+		
+		try 
+		{
+			pageNumber = Integer.valueOf(page) * 20;
+			
+		}catch(NumberFormatException e) {
+			
+			return new ResponseEntity<>("numeric parameter required"  , HttpStatus.BAD_REQUEST);
+		}
+		
+		return new ResponseEntity<>(postRepository.getPostSnippetsFromTag(tag ,pageNumber) , HttpStatus.OK);
+	}
 	
 	
 	

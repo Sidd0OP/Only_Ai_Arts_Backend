@@ -89,6 +89,9 @@ public class MediaService {
 		
 		try {
 			
+			
+			
+			
 			s3client.putObject(request, RequestBody.fromBytes(file.getBytes()));
 			
 		} catch (AwsServiceException | SdkClientException | IOException e) {

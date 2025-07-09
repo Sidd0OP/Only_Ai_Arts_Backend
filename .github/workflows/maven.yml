@@ -27,6 +27,10 @@ env:
   google_client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
   google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
+  email_host: ${{ secrets.EMAIL_HOST }}
+  email_password: ${{ secrets.EMAIL_PASSWORD }}
+  email_username: ${{ secrets.EMAIL_USERNAME }}
+
 jobs:
 
   build:
@@ -60,6 +64,9 @@ jobs:
             -e cloudflare_publicUrl=$cloudflare_publicUrl \
             -e google_client_id=$google_client_id \
             -e google_client_secret=$google_client_secret \
+            -e email_host=$email_host \
+            -e email_password=$email_password \
+            -e email_username=$email_username \
             only-ai-art-server)
         
         echo "Waiting for docker to run appplication"
@@ -131,6 +138,10 @@ jobs:
           echo "cloudflare_publicUrl=${{ secrets.CLOUDFLARE_PUBLICURL }}" >> .env
           echo "google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
           echo "google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "email_host=${{ secrets.EMAIL_HOST }}" >> .env
+          echo "email_password=${{ secrets.EMAIL_PASSWORD }}" >> .env
+          echo "email_username=${{ secrets.EMAIL_USERNAME }}" >> .env
+          
 
           
       - name: Sending env file to start container 

@@ -26,10 +26,12 @@ import com.simulator.forum.entity.Reset;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.mail.EmailSender;
 import com.simulator.forum.model.RegisterForm;
+import com.simulator.forum.model.ResetForm;
 import com.simulator.forum.model.update.PasswordUpdateForm;
 import com.simulator.forum.repository.ResetRepository;
 import com.simulator.forum.repository.UserRepository;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -115,11 +117,13 @@ public class AuthenticationController {
 		
 		if(!validEmail(email)) 
 		{
+			
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
 		if(newEmail(email)) 
 		{
+			
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
@@ -130,33 +134,99 @@ public class AuthenticationController {
 		
 		try {
 			
+			resetRepository.deleteAllByEmail(email);
 			resetRepository.save(entity);
 			
 		}catch(Exception e) {
+			
 			
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			
 		}
 		
-//		try {
-//			
-//			sendMail(email , token);
-//			
-//		}catch(Exception e) {
-//			
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			
-//		}
+		try {
+			
+			sendMail(email , token);
+			
+		}catch(Exception e) {
+			
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
+		}
 		
 		
 		return new ResponseEntity<>("ok"  , HttpStatus.OK);
 	}
 	
 	
-	private void sendMail(String mail , String token) 
+	private void sendMail(String mail , String token) throws MessagingException 
 	{
-		sender.sendSimpleMessage(mail, "Forgot Password", token);
+		sender.sendSimpleMessage(mail, "Reset Password", token);
+	}
+	
+	
+	@PostMapping("/reset")
+	public ResponseEntity<?> resetPasswordFromToken(@ModelAttribute ResetForm resetDetails)
+	{
+		String email = resetDetails.getEmail();
+		String password = resetDetails.getNewPassword();
+		String token = resetDetails.getToken();
+		
+		if(email == null || password == null || token == null) {
+			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!validEmail(email)) 
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!validPassword(password)) 
+		{
+			return new ResponseEntity<>("Invalid Password" , HttpStatus.BAD_REQUEST);
+		}
+		
+		if(newEmail(email)) 
+		{
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		
+		Reset entity;		
+		entity = resetRepository.findByToken(token);
+			
+		if(entity ==  null) 
+		{
+			return new ResponseEntity<>("Wrong token provided" , HttpStatus.BAD_REQUEST);
+		}
+		
+		if(!entity.getEmail().equals(email)) 
+		{
+			return new ResponseEntity<>("Email does not exist" , HttpStatus.BAD_REQUEST);
+		}
+		
+		
+		if(Duration.between(entity.getTime(), ZonedDateTime.now()).getSeconds() > 600 ) 
+		{
+			resetRepository.deleteAllByEmail(email);
+			return new ResponseEntity<>("Token expired" , HttpStatus.BAD_REQUEST);
+			
+		}
+		
+		UserDetail userEntity  = userRepository.findByEmail(email);
+		
+		
+		String salt = generateSalt();
+		String hash = hash(password , salt);
+		
+		userEntity.setSalt(salt);
+		userEntity.setPassword(hash);
+		
+		resetRepository.deleteAllByEmail(email);
+		
+		return new ResponseEntity<>("ok"  , HttpStatus.OK);
 	}
 	
 	@PostMapping("/register")

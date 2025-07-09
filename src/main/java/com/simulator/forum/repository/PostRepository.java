@@ -30,8 +30,8 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 				where model is not null AND TRIM(model) <> '' 
 				order by heart desc ,
 				comment_count desc
-				limit 5
-			);
+				limit 100
+			) limit 5;
 
 			
 			""" , nativeQuery = true)

@@ -4,14 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.simulator.forum.dto.PostDto;
 import com.simulator.forum.dto.snippet.GallerySnippet;
-import com.simulator.forum.dto.snippet.HomePostSnippet;
+import com.simulator.forum.dto.snippet.PostSnippet;
 import com.simulator.forum.entity.Post;
 
 
@@ -36,40 +32,7 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			
 			""" , nativeQuery = true)
 	List<String> getTrendingTool();
-
 	
-	@Query(value =  """
-			
-			select 
-			p.id as post_id, 
-			p.title , 
-			p.body ,
-			p.created ,
-			p.edited , 
-			p.comment_count , 
-			p.image_url ,
-			p.heart,
-			p.model,
-			p.rated,
-			u.id as user_id , 
-			u.name ,
-			u.profile_photo_url,
-			string_agg(t.text, ',') AS tags
-			from post p 
-			join user_detail u on
-			p.user_id = u.id
-			LEFT join tag t on 
-			p.id = t.post_id
-			GROUP BY 
-		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
-		    p.image_url, p.heart, p.model, p.rated,
-		    u.id, u.name, u.profile_photo_url
-			order by p.heart desc , p.created desc , p.comment_count desc
-			limit 20
-			offset ?1;
-			
-			""" , nativeQuery = true)
-	List<HomePostSnippet> getPostSnippets(int offset);
 	
 	@Query(value =  """
 			
@@ -84,115 +47,50 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 			
 			""" , nativeQuery = true)
 	List<GallerySnippet> getGallerySnippets(int offset);
-	
-	
-	
-	
-	@Query(value =  """
-			
-			select 
-			p.id as post_id, 
-			p.title , 
-			p.body ,
-			p.created ,
-			p.edited , 
-			p.comment_count , 
-			p.image_url ,
-			p.heart,
-			p.model,
-			p.rated,
-			u.id as user_id , 
-			u.name ,
-			u.profile_photo_url,
-			string_agg(t.text, ',') AS tags
-			from post p 
-			join user_detail u on
-			p.user_id = u.id
-			LEFT join tag t on 
-			p.id = t.post_id
-			GROUP BY 
-		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
-		    p.image_url, p.heart, p.model, p.rated,
-		    u.id, u.name, u.profile_photo_url
-			order by p.created desc 
-			limit 10;
-			
-			""" , nativeQuery = true)
-	List<HomePostSnippet> getLatestPostSnippets();
-	
-	
-	
-	@Query(value =  """
-			
-			SELECT 
-		    p.id AS post_id, 
-		    p.title, 
-		    p.body,
-		    p.created,
-		    p.edited, 
-		    p.comment_count, 
-		    p.image_url,
-		    p.heart,
-		    p.model,
-		    p.rated,
-		    u.id AS user_id, 
-		    u.name,
-		    u.profile_photo_url,
-		    string_agg(t.text, ',') AS tags
-			FROM post p
-			JOIN user_detail u ON p.user_id = u.id
-			LEFT JOIN tag t ON p.id = t.post_id
-			WHERE EXISTS (
-			    SELECT 1 FROM tag t2 WHERE t2.post_id = p.id AND t2.text ILIKE ?1 
-			)
-			GROUP BY 
-		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
-		    p.image_url, p.heart, p.model, p.rated,
-		    u.id, u.name, u.profile_photo_url
-			ORDER BY p.heart DESC, p.created DESC, p.comment_count DESC
-			LIMIT 20 OFFSET ?2;
-			
-			""" , nativeQuery = true)
-	List<HomePostSnippet> getPostSnippetsFromTag(String tag , Integer offset);
-	
-	
-	
-	@Query(value =  """
-			
-			select 
-			p.id as post_id, 
-			p.title , 
-			p.body ,
-			p.created ,
-			p.edited , 
-			p.comment_count , 
-			p.image_url ,
-			p.heart,
-			p.model,
-			p.rated,
-			u.id as user_id , 
-			u.name ,
-			u.profile_photo_url,
-			string_agg(t.text, ',') AS tags
-			from post p 
-			join user_detail u on
-			p.user_id = u.id and p.id = ?1
-			LEFT join tag t on 
-			p.id = t.post_id
-			GROUP BY 
-		    p.id, p.title, p.body, p.created, p.edited, p.comment_count, 
-		    p.image_url, p.heart, p.model, p.rated,
-		    u.id, u.name, u.profile_photo_url
-			
-			""" , nativeQuery = true)
-	Optional<PostDto> getPostSnippetFromId(long postId);
-	
-	
-	
-	
 
 	
 	
+	
+	
+	
+	@Query(value =  """
+			
+			select * from get_post_page(?1 , ?2);
+			
+			""" , nativeQuery = true)
+	List<PostSnippet> getPostSnippets(int offset , long userId);
+	
+	
+	
+	
+	
+	
+	@Query(value =  """
+			
+			select * from get_post_latest(?1 , ?1);
+			
+			""" , nativeQuery = true)
+	List<PostSnippet> getLatestPostSnippets(int offset , long userId);
+	
+	
+	
+	@Query(value =  """
+			
+			select * from get_post_of_tag(?1 , ?2 , ?3);
+			
+			""" , nativeQuery = true)
+	List<PostSnippet> getPostSnippetsFromTag(Integer offset , String tag , long userId);
+	
+	
+	
+	@Query(value =  """
+			
+			select * from get_post_of_id(?1 , ?2);
+			
+			""" , nativeQuery = true)
+	Optional<PostSnippet> getPostSnippetFromId(long postId , long userId);
+	
+
 	
 	@Query(value =  """
 			
@@ -212,19 +110,17 @@ public interface PostRepository extends JpaRepository<Post , Long>{
 	
 	
 	
-	
-	
 	@Query(value =  """
 			
-			select * from similar_post(?1)
+			select * from get_post_of_user(?1 , ?2 , ?3)
 			
 			""" , nativeQuery = true)
-	List<HomePostSnippet> selectSimilarPost(long postId);
+	List<PostSnippet> postOfUser(int offset , long userId , long loggedInUserId);
 	
 	@Query(value =  """
 			
 			select * from search_post(?1)
 			
 			""" , nativeQuery = true)
-	List<HomePostSnippet> searchPost(String query);
+	List<PostSnippet> searchPost(String query);
 }

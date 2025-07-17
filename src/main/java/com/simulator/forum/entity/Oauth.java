@@ -1,5 +1,8 @@
 package com.simulator.forum.entity;
 
+import java.time.ZonedDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +21,11 @@ public class Oauth {
 	
 	private String subject;
 	
+	@Column( insertable = false)
+	private ZonedDateTime time;
+	
+	
+
 	public Oauth() {
 		
 	}
@@ -50,5 +58,9 @@ public class Oauth {
 
 	public void setSubject(String subject) {
 		this.subject = subject;
+	}
+	
+	public ZonedDateTime getTime() {
+		return time;
 	}
 }

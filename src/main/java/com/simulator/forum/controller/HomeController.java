@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.simulator.forum.dto.snippet.HomeDto;
-import com.simulator.forum.dto.snippet.HomePostSnippet;
+import com.simulator.forum.dto.HomeDto;
+import com.simulator.forum.dto.snippet.PostSnippet;
 import com.simulator.forum.entity.UserDetail;
 import com.simulator.forum.repository.HeartRepository;
 import com.simulator.forum.repository.PostRepository;
 import com.simulator.forum.repository.TagRepository;
 import com.simulator.forum.repository.UserRepository;
+import com.simulator.forum.search.Search;
 
 
 @RestController
@@ -36,6 +37,9 @@ public class HomeController {
 	
 	@Autowired
 	private TagRepository tagRepository;
+	
+	
+	Search search = new Search();
 	
 	
 	private UserDetail findUserFromSession() 
@@ -60,10 +64,11 @@ public class HomeController {
 		
 		List<Long> heartedPosts = List.of();
 		
+		long userId = -1;
 		
 		if(user != null) 
 		{
-			long userId = user.getId();
+			userId = user.getId();
 			heartedPosts = heartRepository.getHeartedPost(userId);
 		}
 		
@@ -72,8 +77,8 @@ public class HomeController {
 		HomeDto homeData = new HomeDto(	postRepository.getTrendingTool(),
 										tagRepository.getTrendingTags() ,
 										heartedPosts , 
-										postRepository.getLatestPostSnippets(), 
-										postRepository.getPostSnippets(0));
+										postRepository.getLatestPostSnippets(0 , userId), 
+										postRepository.getPostSnippets(0 , userId));
 		
 		return new ResponseEntity<>(homeData  , HttpStatus.OK);
 	}
@@ -82,7 +87,9 @@ public class HomeController {
 	@GetMapping("/search/{query}")
 	public ResponseEntity<?> search(@PathVariable String query)
 	{
-		List<HomePostSnippet> searchResult;
+		
+//		search.keyphrase(query);
+		List<PostSnippet> searchResult;
 		
 		try {
 			
@@ -127,6 +134,16 @@ public class HomeController {
 	public ResponseEntity<?> loadPostFromTags(@PathVariable String tag , @PathVariable String page)
 	{
 		
+		UserDetail user =  findUserFromSession();
+		
+		
+		long userId = -1;
+		
+		if(user != null) 
+		{
+			userId = user.getId();
+			
+		}
 		
 		if(page == null) 
 		{
@@ -145,7 +162,7 @@ public class HomeController {
 			return new ResponseEntity<>("numeric parameter required"  , HttpStatus.BAD_REQUEST);
 		}
 		
-		return new ResponseEntity<>(postRepository.getPostSnippetsFromTag(tag ,pageNumber) , HttpStatus.OK);
+		return new ResponseEntity<>(postRepository.getPostSnippetsFromTag(pageNumber , tag , userId) , HttpStatus.OK);
 	}
 	
 	
@@ -171,7 +188,19 @@ public class HomeController {
 			return new ResponseEntity<>("numeric parameter required"  , HttpStatus.BAD_REQUEST);
 		}
 		
-		return new ResponseEntity<>(postRepository.getPostSnippets(pageNumber) , HttpStatus.OK);
+		
+		
+		UserDetail user =  findUserFromSession();
+				
+		long userId = -1;
+		
+		if(user != null) 
+		{
+			userId = user.getId();
+			
+		}
+		
+		return new ResponseEntity<>(postRepository.getPostSnippets(pageNumber , userId) , HttpStatus.OK);
 	}
 	
 	

@@ -86,18 +86,32 @@ public class UserController {
 	{
 		UserDetail userDetail =  findUserFromSession();
 		
-		boolean dataEditable =  false;
+		long loggedInUserId = -1;
+		boolean profileEditable = false;
 			
 		if(userDetail != null) 
 		{
-			if(userId == userDetail.getId()) {
-				dataEditable = true;
-			}		
+			loggedInUserId = userDetail.getId();	
+			
+			if(loggedInUserId == userId) 
+			{
+				profileEditable = true;
+			}
 			
 		}
-
+		
+		
 		
 		Optional<UserDetail> user = userRepository.findById(userId);
+		
+		if(user.isEmpty()) 
+		{
+			return new ResponseEntity<>("User not found"	, HttpStatus.OK);
+		}
+		
+		
+		String userName = user.get().getName();
+		String profilePhotoUrl = user.get().getProfilePhotoUrl();
 		
 		if(user.isEmpty()) {return new ResponseEntity<>("User not found"  , HttpStatus.NOT_FOUND);}
 		
@@ -114,21 +128,28 @@ public class UserController {
 		
 		List<CommentSnippet> comments = commentRepository.findAllByUserId(userId).stream()
 				.map(c -> new CommentSnippet(
-						c.getPostId() ,
-						c.getId(),
+						c.getId() ,
+						c.getUserId(),
 						c.getBody() , 
 						safeInstant(c.getCreated()),
 						safeInstant(c.getEdited()) , 
-						c.getEditCount())
+						userName,
+						profilePhotoUrl,
+						true)
 						).toList();
 		
 		
 		List<ReplySnippet> replies = replyRepository.findAllByUserId(userId).stream()
 				.map(r -> new ReplySnippet(
 						r.getId(),
+						r.getUserId(),
+						r.getCommentId(),
 						r.getBody(),
 						safeInstant(r.getCreated()),
-						safeInstant(r.getEdited()) 
+						safeInstant(r.getEdited()),
+						userName,
+						profilePhotoUrl,
+						true
 						)
 					).toList();
 		
@@ -136,7 +157,7 @@ public class UserController {
 		
 		
 		UserProfileDto userProfile = new UserProfileDto(
-				dataEditable,
+				profileEditable,
 				user.get().getId() , 
 				user.get().getName() , 
 				user.get().getProfilePhotoUrl(),

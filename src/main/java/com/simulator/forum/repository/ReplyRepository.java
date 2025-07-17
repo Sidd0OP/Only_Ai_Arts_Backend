@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simulator.forum.dto.ReplyDto;
+import com.simulator.forum.dto.snippet.ReplySnippet;
 import com.simulator.forum.entity.Reply;
 
 public interface ReplyRepository extends JpaRepository<Reply , Long>{
@@ -23,12 +23,13 @@ public interface ReplyRepository extends JpaRepository<Reply , Long>{
 			r.created , 
 			r.edited ,
 			u.name as user_name, 
-			u.profile_photo_url 
+			u.profile_photo_url,
+			exists ( select 1 from reply r1 where r1.user_id = ?2) as editable
 			from reply r join user_detail u 
 			on r.user_id = u.id and r.post_id = ?1
 			
 			""" , nativeQuery = true)
-	List<ReplyDto> getAllReplies(long postId);
+	List<ReplySnippet> getAllReplies(long postId , long userId);
 
 	
 	List<Reply> findAllByUserId(long userId);

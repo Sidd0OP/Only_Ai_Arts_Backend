@@ -32,6 +32,19 @@
 	</properties>
 	<dependencies>
 		
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+	        <groupId>org.junit.jupiter</groupId>
+	        <artifactId>junit-jupiter-engine</artifactId>
+	        <scope>test</scope>
+	    </dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -65,48 +78,66 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
-	     <groupId>software.amazon.awssdk</groupId>
-	     <artifactId>s3</artifactId>
-	     <version>${cloudflare-aws-sdk-version}</version>
-	     <scope>compile</scope>
+		     <groupId>software.amazon.awssdk</groupId>
+		     <artifactId>s3</artifactId>
+		     <version>${cloudflare-aws-sdk-version}</version>
+		     <scope>compile</scope>
 	  	</dependency>
 
 
-	  <dependency>
-	     <groupId>software.amazon.awssdk</groupId>
-	     <artifactId>apache-client</artifactId>
-	     <version>${cloudflare-aws-sdk-version}</version>
-	  </dependency>
-	  
-	  <dependency>
-	    <groupId>com.google.oauth-client</groupId>
-	    <artifactId>google-oauth-client</artifactId>
-	    <version>1.39.0</version>
-	</dependency>
+		  <dependency>
+		     <groupId>software.amazon.awssdk</groupId>
+		     <artifactId>apache-client</artifactId>
+		     <version>${cloudflare-aws-sdk-version}</version>
+		  </dependency>
+		  
+		  <dependency>
+		    <groupId>com.google.oauth-client</groupId>
+		    <artifactId>google-oauth-client</artifactId>
+		    <version>1.39.0</version>
+		  </dependency>
 	
-	<dependency>
-     <groupId>com.google.api-client</groupId>
-     <artifactId>google-api-client</artifactId>
-     <version>1.32.1</version>
-   </dependency>
+		<dependency>
+	     <groupId>com.google.api-client</groupId>
+	     <artifactId>google-api-client</artifactId>
+	     <version>1.32.1</version>
+	    </dependency>
    
-   <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-mail</artifactId>
-    </dependency>
+	   <dependency>
+	      <groupId>org.springframework.boot</groupId>
+	      <artifactId>spring-boot-starter-mail</artifactId>
+	    </dependency>
+    
+	    <dependency>
+		    <groupId>edu.stanford.nlp</groupId>
+		    <artifactId>stanford-corenlp</artifactId>
+		    <version>4.5.10</version>
+		</dependency>
 		
+		<dependency>
+		    <groupId>edu.stanford.nlp</groupId>
+		    <artifactId>stanford-corenlp</artifactId>
+		    <version>4.5.10</version>
+		    <classifier>models</classifier>
+		</dependency>
+	
+		<dependency>
+		    <groupId>org.flywaydb</groupId>
+		    <artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+	
+		<dependency>
+		    <groupId>javax</groupId>
+		    <artifactId>javaee-api</artifactId>
+		    <version>8.0.1</version>
+		    <scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

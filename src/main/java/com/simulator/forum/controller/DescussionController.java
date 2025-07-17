@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,12 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.simulator.forum.cloudflare.MediaService;
-import com.simulator.forum.dto.CommentDto;
 import com.simulator.forum.dto.CommentReplyDto;
-import com.simulator.forum.dto.PostCommentReplyDto;
-import com.simulator.forum.dto.PostDto;
-import com.simulator.forum.dto.ReplyDto;
-import com.simulator.forum.dto.snippet.HomePostSnippet;
+import com.simulator.forum.dto.PostPageDto;
+import com.simulator.forum.dto.snippet.CommentSnippet;
+import com.simulator.forum.dto.snippet.PostSnippet;
+import com.simulator.forum.dto.snippet.ReplySnippet;
 import com.simulator.forum.entity.Comment;
 import com.simulator.forum.entity.Post;
 import com.simulator.forum.entity.Reply;
@@ -71,6 +69,9 @@ public class DescussionController {
 	MediaService mediaSerive;
 	
 	
+	private final int allowedEditCount = 5;
+	
+	
 	private UserDetail findUserFromSession() 
 	{
 		Authentication  authObject  = SecurityContextHolder.getContext().getAuthentication();
@@ -94,10 +95,12 @@ public class DescussionController {
 		
 		UserDetail user =  findUserFromSession();	
 		
-		boolean postEditable = false;
-		boolean hearted = false;
+		long loggedInUserId = -1;
+		
+		if(user != null) {loggedInUserId = user.getId();}
 				
-		Optional<PostDto> post = postRepository.getPostSnippetFromId(postId);
+		
+		Optional<PostSnippet> post = postRepository.getPostSnippetFromId(postId , loggedInUserId);
 		
 		
 		if(!post.isPresent()) 
@@ -105,8 +108,9 @@ public class DescussionController {
 			return new ResponseEntity<>("Not Found"  , HttpStatus.NOT_FOUND);
 		}
 		
-		List<CommentDto> comments = commentRepository.getAllComments(postId);
-		List<ReplyDto> replies = replyRepository.getAllReplies(postId);
+		
+		List<CommentSnippet> comments = commentRepository.getAllComments(postId , loggedInUserId);
+		List<ReplySnippet>   replies = replyRepository.getAllReplies(postId , loggedInUserId);
 		
 
 		List<CommentReplyDto> commentReplies = comments.stream()
@@ -117,69 +121,31 @@ public class DescussionController {
 							 .toList())).toList();
 		
 		
-		List<HomePostSnippet> similarPost;
+		List<PostSnippet> postOfUser;
 		
 		try {
-			similarPost = postRepository.selectSimilarPost(postId);
+			
+			postOfUser = postRepository.postOfUser(0 , post.get().userId() , loggedInUserId);
 			
 		}catch(Exception e) {
-			similarPost = List.of();
-		}
-		
-		
-		
-		if(user != null) 
-		{
-			long userId = user.getId();
 			
-			if(post.get().userId() == userId) 
-			{
-
-				postEditable = true;
-				
-			}
-			
-			if(heartRepository.hasUserHearted(post.get().postId() , userId)) {
-				
-				hearted =  true;
-			}
-			
-			PostCommentReplyDto postCommentReplyDto = new PostCommentReplyDto
-					(
-							
-							postEditable,
-							
-							hearted,
-							
-							comments.stream()
-							.filter( c -> c.userId() == userId)
-							.map(CommentDto::commentId).toList(),
-							
-							replies.stream()
-							.filter(r -> r.userId() == userId)
-							.map(ReplyDto::replyId)
-							.toList(),
-							
-							post.get(),
-							
-							commentReplies,
-							
-							similarPost
-							
-					);
-			
-			return new ResponseEntity<>(postCommentReplyDto , HttpStatus.OK);
+			postOfUser = List.of();
 			
 		}
-				
+		
 
-		return new ResponseEntity<>(new PostCommentReplyDto(false ,
-															hearted,
-															List.of() , 
-															List.of() , 
-															post.get() , 
-															commentReplies,
-															similarPost) , HttpStatus.OK);
+			
+		PostPageDto postCommentReplyDto = new PostPageDto
+										  (							
+											post.get(),
+											commentReplies,
+											postOfUser	
+										  );
+		
+			
+		return new ResponseEntity<>(postCommentReplyDto , HttpStatus.OK);
+			
+		
 		
 	}
 	
@@ -283,6 +249,7 @@ public class DescussionController {
 		
 		if(post.get().getUserId() != user.getId()) {return new ResponseEntity<>("Not allowed"  , HttpStatus.FORBIDDEN);}
 		
+		if(post.get().getEditCount() > allowedEditCount) {return new ResponseEntity<>("Edit Limit Exceeded"  , HttpStatus.FORBIDDEN);}
 		
 		Post entity = post.get();
 		entity.setBody(postUpdateDetails.getBody());
@@ -347,6 +314,7 @@ public class DescussionController {
 		
 		if(comment.get().getUserId() != user.getId()) {return new ResponseEntity<>("Not allowed"  , HttpStatus.FORBIDDEN);}
 		
+		if(comment.get().getEditCount() > allowedEditCount) {return new ResponseEntity<>("Edit Limit Exceeded"  , HttpStatus.FORBIDDEN);}
 		
 		Comment entity = comment.get();
 		
@@ -429,6 +397,7 @@ public class DescussionController {
 		
 		if(reply.get().getUserId() != user.getId()) {return new ResponseEntity<>("Not allowed"  , HttpStatus.FORBIDDEN);}
 		
+		if(reply.get().getEditCount() > allowedEditCount) {return new ResponseEntity<>("Edit Limit Exceeded"  , HttpStatus.FORBIDDEN);}
 		
 		Reply entity = reply.get();
 		

@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.simulator.forum.dto.CommentDto;
 import com.simulator.forum.dto.snippet.CommentSnippet;
-import com.simulator.forum.dto.snippet.HomePostSnippet;
 import com.simulator.forum.entity.Comment;
 
 
@@ -25,12 +23,13 @@ public interface CommentRepository extends JpaRepository<Comment , Long>{
 			c.created , 
 			c.edited ,
 			u.name as user_name, 
-			u.profile_photo_url 
+			u.profile_photo_url,
+			exists ( select 1 from comment c1 where c1.user_id = ?2) as editable
 			from comment c join user_detail u on 
-			c.user_id = u.id and c.post_id = ?1
+			c.user_id = u.id and c.post_id = ?1;
 			
 			""" , nativeQuery = true)
-	List<CommentDto> getAllComments(long postId);
+	List<CommentSnippet> getAllComments(long postId , long userId);
 
 
 	List<Comment> findAllByUserId(long userId);

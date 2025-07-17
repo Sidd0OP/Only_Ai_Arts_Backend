@@ -1,10 +1,10 @@
-package com.simulator.forum.dto;
+package com.simulator.forum.dto.snippet;
 
 import java.time.Instant;
 
 
-public record PostDto
-	(
+public record PostSnippet(
+		
 		Long postId,
 		String title,
 		String body,
@@ -17,10 +17,11 @@ public record PostDto
 		Boolean rated,
 		Long userId,
 		String userName,
-		String userProfliePhotoUrl,
-		String tags
-	
+		String profliePhotoUrl,
+		String tags,
+		Boolean hearted
 		
 		) {
 
 }
+

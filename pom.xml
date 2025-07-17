@@ -113,19 +113,6 @@
 	      <groupId>org.springframework.boot</groupId>
 	      <artifactId>spring-boot-starter-mail</artifactId>
 	    </dependency>
-    
-	    <dependency>
-		    <groupId>edu.stanford.nlp</groupId>
-		    <artifactId>stanford-corenlp</artifactId>
-		    <version>4.5.10</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>edu.stanford.nlp</groupId>
-		    <artifactId>stanford-corenlp</artifactId>
-		    <version>4.5.10</version>
-		    <classifier>models</classifier>
-		</dependency>
 	
 		<dependency>
 		    <groupId>org.flywaydb</groupId>

@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import edu.stanford.nlp.pipeline.CoreDocument;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.simple.Sentence;
+//import edu.stanford.nlp.pipeline.CoreDocument;
+//import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+//import edu.stanford.nlp.simple.Sentence;
 
 public class Search {
 	
 	
-	private static StanfordCoreNLP pipeline;
+//	private static StanfordCoreNLP pipeline;
 	
 	public static Properties props = new Properties();
 	
@@ -20,15 +20,15 @@ public class Search {
 	{
 		props.setProperty("annotators", "tokenize,pos,lemma,ner");
 		props.setProperty("ner.useSUTime", "false");
-		pipeline = new StanfordCoreNLP(props);
+//		pipeline = new StanfordCoreNLP(props);
 		
 		return true;
 	}
 	
 	public void keyphrase(String query)
 	{
-		CoreDocument doc = new CoreDocument(query);
-		pipeline.annotate(doc);
+//		CoreDocument doc = new CoreDocument(query);
+//		pipeline.annotate(doc);
 		
 		System.out.println("tokens and ner tags");
 //	    String tokensAndNERTags = doc.tokens().stream().map(token -> "("+token.word()+","+token.ner()+")").collect(

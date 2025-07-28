@@ -12,7 +12,12 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.EncryptionTypeMismatchException;
+import software.amazon.awssdk.services.s3.model.InvalidRequestException;
+import software.amazon.awssdk.services.s3.model.InvalidWriteOffsetException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.TooManyPartsException;
 
 @Service
 public class MediaService {
@@ -42,7 +47,15 @@ public class MediaService {
         return filename.substring(idx+1);
     }
 
-	public String uploadFile(MultipartFile file , String folder) 
+	public String uploadFile(MultipartFile file , String folder) throws 
+	InvalidRequestException,
+	InvalidWriteOffsetException, 
+	TooManyPartsException, 
+	EncryptionTypeMismatchException,
+	S3Exception,
+	AwsServiceException,
+	SdkClientException,
+	IOException 
 	{
 				
 		String extension = getFileExtension(file.getOriginalFilename());
@@ -87,17 +100,11 @@ public class MediaService {
 	            .build();
 		
 		
-		try {
+		
 			
+		s3client.putObject(request, RequestBody.fromBytes(file.getBytes()));
 			
-			
-			
-			s3client.putObject(request, RequestBody.fromBytes(file.getBytes()));
-			
-		} catch (AwsServiceException | SdkClientException | IOException e) {
-			
-			e.printStackTrace();
-		}
+		
 		
 		
 		return  sb.append("/").append(request.key()).toString();

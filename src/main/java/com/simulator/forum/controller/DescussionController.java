@@ -1,5 +1,7 @@
 package com.simulator.forum.controller;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import com.simulator.forum.dto.PostPageDto;
 import com.simulator.forum.dto.snippet.CommentSnippet;
 import com.simulator.forum.dto.snippet.PostSnippet;
 import com.simulator.forum.dto.snippet.ReplySnippet;
+import com.simulator.forum.dto.snippet.UserProfileSnippet;
 import com.simulator.forum.entity.Comment;
 import com.simulator.forum.entity.Post;
 import com.simulator.forum.entity.Reply;
@@ -93,19 +96,52 @@ public class DescussionController {
 	public ResponseEntity<?> post(HttpServletRequest request , @PathVariable Long postId ) 
 	{
 		
-		UserDetail user =  findUserFromSession();	
-		
 		long loggedInUserId = -1;
+		long userIdOfPost;
+		boolean editable = false;
 		
+		UserProfileSnippet profileSnippet = null;
+		
+		UserDetail user =  findUserFromSession();
 		if(user != null) {loggedInUserId = user.getId();}
 				
 		
-		Optional<PostSnippet> post = postRepository.getPostSnippetFromId(postId , loggedInUserId);
+		
+		Optional<PostSnippet> post =  Optional.empty(); 
+				
+		try {
+			
+			post = postRepository.getPostSnippetFromId(postId , loggedInUserId);
+			
+		}catch(Exception e){
+			
+		}
+				
 		
 		
 		if(!post.isPresent()) 
 		{
 			return new ResponseEntity<>("Not Found"  , HttpStatus.NOT_FOUND);
+		}
+		
+		
+		userIdOfPost = post.get().userId();
+		Optional<UserDetail> userOfPost = userRepository.findById(userIdOfPost);
+		
+		if(loggedInUserId == userIdOfPost) 
+		{
+			editable = true;
+		}
+		
+		if(!userOfPost.isEmpty()) 
+		{
+			
+			profileSnippet = new UserProfileSnippet(editable , 
+					userIdOfPost , 
+					userOfPost.get().getName(),
+					userOfPost.get().getProfilePhotoUrl(),
+					safeInstant(userOfPost.get().getCreated()),
+					userOfPost.get().getBio());
 		}
 		
 		
@@ -138,6 +174,7 @@ public class DescussionController {
 		PostPageDto postCommentReplyDto = new PostPageDto
 										  (							
 											post.get(),
+											profileSnippet,
 											commentReplies,
 											postOfUser	
 										  );
@@ -147,6 +184,11 @@ public class DescussionController {
 			
 		
 		
+	}
+	
+	
+	private Instant safeInstant(ZonedDateTime date) {
+	    return date != null ? date.toInstant() : null;
 	}
 	
 	
@@ -217,7 +259,8 @@ public class DescussionController {
 										postDetails.getBody() , 
 										url,
 										postDetails.getModel(),
-										postDetails.isRated());
+										postDetails.isRated()
+										);
 			
 			
 			
